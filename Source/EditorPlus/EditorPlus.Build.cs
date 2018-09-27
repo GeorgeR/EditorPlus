@@ -1,5 +1,3 @@
-// Copyright 1998-2018 Epic Games, Inc. All Rights Reserved.
-
 using UnrealBuildTool;
 
 public class EditorPlus : ModuleRules
@@ -10,46 +8,45 @@ public class EditorPlus : ModuleRules
 		
 		PublicIncludePaths.AddRange(
 			new string[] {
-				"EditorPlus/Public"
-				// ... add public include paths required here ...
-			}
-			);
-				
-		
+				"EditorPlus/Public",
+				"EditorPlus/Public/Validation",
+			});
+
 		PrivateIncludePaths.AddRange(
 			new string[] {
 				"EditorPlus/Private",
-				// ... add other private include paths required here ...
-			}
-			);
+				"EditorPlus/Private/Validation",
+			});
 			
 		
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"Core",
-				// ... add other public dependencies that you statically link with here ...
-			}
-			);
-			
+				"Core",				
+				"CoreUObject",
+				"Engine",
+				"TargetPlatform",
+			});
 		
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"CoreUObject",
-				"Engine",
+				"AssetRegistry",
+				"AssetTools",
+				"BlueprintGraph",
+				"CollectionManager",
+				"ContentBrowser",
+				"EditorStyle",
+				"GraphEditor",
+				"InputCore",
+				"Json",
+				"KismetCompiler",
+				"PropertyEditor",
+				"SandboxFile",
 				"Slate",
-				"SlateCore",
-				// ... add private dependencies that you statically link with here ...	
-			}
-			);
-		
-		
-		DynamicallyLoadedModuleNames.AddRange(
-			new string[]
-			{
-				// ... add any modules that your module loads dynamically here ...
-			}
-			);
+				"SlateCore",				
+				"UnrealEd",
+				"WorkspaceMenuStructure",
+			});
 	}
 }

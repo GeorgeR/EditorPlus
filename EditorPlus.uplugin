@@ -16,7 +16,7 @@
 	"Modules": [
 		{
 			"Name": "EditorPlus",
-			"Type": "Developer",
+			"Type": "Editor",
 			"LoadingPhase": "Default"
 		}
 	]
