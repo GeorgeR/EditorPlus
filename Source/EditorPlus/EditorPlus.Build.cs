@@ -5,19 +5,21 @@ public class EditorPlus : ModuleRules
 	public EditorPlus(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
-		
-		PublicIncludePaths.AddRange(
-			new string[] {
-				"EditorPlus/Public",
-				"EditorPlus/Public/Validation",
-			});
 
-		PrivateIncludePaths.AddRange(
-			new string[] {
-				"EditorPlus/Private",
-				"EditorPlus/Private/Validation",
-			});
-			
+	    if (Target.Version.MinorVersion <= 19)
+	    {
+            PublicIncludePaths.AddRange(
+			    new string[] {
+				    "EditorPlus/Public",
+				    "EditorPlus/Public/Validation",
+			    });
+
+		    PrivateIncludePaths.AddRange(
+			    new string[] {
+				    "EditorPlus/Private",
+				    "EditorPlus/Private/Validation",
+			    });
+		}
 		
 		PublicDependencyModuleNames.AddRange(
 			new string[]
