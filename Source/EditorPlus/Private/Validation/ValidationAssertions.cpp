@@ -54,7 +54,8 @@ bool Validation::FUtilities::PrintErrors(const struct FLogCategoryBase& LogCateg
 
     for (auto i = 0; i < ValidationErrors.Num(); i++)
     {
-        UE_LOG_ERROR_CATEGORY(LogCategory, *ValidationErrors[i].ToString());
+		// TODO: Fix this call
+        //UE_LOG_ERROR_CATEGORY(LogCategory, *ValidationErrors[i].ToString());
     }
     
     return true;
