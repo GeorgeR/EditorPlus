@@ -24,26 +24,36 @@ public class EditorPlus : ModuleRules
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"Core",				
+			    "AssetRegistry",
+                "Core",				
 				"CoreUObject",
 				"Engine",
-				"TargetPlatform",
+                "Landscape",
+			    "LandscapeEditor",
+                "TargetPlatform",
 			});
 		
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"AssetRegistry",
 				"AssetTools",
 				"BlueprintGraph",
 				"CollectionManager",
 				"ContentBrowser",
 				"EditorStyle",
+                "Foliage",
 				"GraphEditor",
 				"InputCore",
 				"Json",
+                "JsonUtilities",
 				"KismetCompiler",
+                "MainFrame",
+                "MaterialEditor",
+                "MaterialUtilities",
+                "MeshDescription",
+                "MeshDescriptionOperations",
 				"PropertyEditor",
+                "RawMesh",
 				"SandboxFile",
 				"Slate",
 				"SlateCore",				
