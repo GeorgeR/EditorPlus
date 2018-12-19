@@ -31,3 +31,20 @@ void UEditorStaticMeshLibrary2::SetMaterialSlot_ByIndex(UStaticMesh* Object, con
 
     Object->SetMaterial(Index, Material);
 }
+
+void UEditorStaticMeshLibrary2::SetMeshBuildSettings(UStaticMesh* Object, bool bRecomputeTangents, bool bRecomputeNormals)
+{
+    check(Object);
+
+    auto NumLODs = Object->GetNumLODs();
+    for (auto i = 0; i < NumLODs; i++)
+    {
+        FStaticMeshSourceModel& SourceModel = Object->SourceModels[i];
+        SourceModel.BuildSettings.bRecomputeNormals = bRecomputeNormals;
+        SourceModel.BuildSettings.bRecomputeTangents = bRecomputeTangents;
+    }
+
+    Object->Build(false);
+    Object->PostEditChange();
+    Object->MarkPackageDirty();
+}

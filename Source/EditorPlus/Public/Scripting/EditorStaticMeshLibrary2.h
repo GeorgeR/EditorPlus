@@ -23,4 +23,7 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "Editor Scripting | StaticMesh", meta = (DisplayName = "SetMaterialSlot"))
     static void SetMaterialSlot_ByIndex(UStaticMesh* Object, const int32 Index, UMaterialInterface* Material);
+
+    UFUNCTION(BlueprintCallable, Category = "Editor Scripting | StaticMesh")
+    static void SetMeshBuildSettings(UStaticMesh* Object, bool bRecomputeTangents, bool bRecomputeNormals);
 };
