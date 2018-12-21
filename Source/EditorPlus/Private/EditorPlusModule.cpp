@@ -1,13 +1,26 @@
 #include "EditorPlusModule.h"
 
-//DEFINE_LOG_CATEGORY(LogEditorPlus);
+#include "ModuleManager.h"
+#include "DetailCustomizations/EditorPlusDetailCustomizations.h"
+
 DEFINE_LOG_CATEGORY(LogEditorPlus);
 
 #define LOCTEXT_NAMESPACE "FEditorPlusModule"
 
-void FEditorPlusModule::StartupModule() { }
+FEditorPlusModule::FEditorPlusModule()
+{
+    DetailCustomizations = MakeUnique<FEditorPlusDetailCustomizations>();
+}
 
-void FEditorPlusModule::ShutdownModule() { }
+void FEditorPlusModule::StartupModule() 
+{
+    DetailCustomizations->Startup();
+}
+
+void FEditorPlusModule::ShutdownModule() 
+{
+    DetailCustomizations->Shutdown();
+}
 
 #undef LOCTEXT_NAMESPACE
 	

@@ -1,12 +1,22 @@
 #pragma once
 
-#include "CoreMinimal.h"
 #include "IEditorPlus.h"
+
+#include "CoreMinimal.h"
+
+class FEditorPlusDetailCustomizations;
 
 class FEditorPlusModule 
     : public IEditorPlusModule
 {
 public:
-	virtual void StartupModule() override;
-	virtual void ShutdownModule() override;
+    FEditorPlusModule();
+    
+	void StartupModule() override;
+	void ShutdownModule() override;
+
+    bool SupportsDynamicReloading() override { return true; }
+
+private:
+    TUniquePtr<FEditorPlusDetailCustomizations> DetailCustomizations;
 };
