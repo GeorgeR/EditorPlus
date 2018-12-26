@@ -143,6 +143,8 @@ TSharedRef<SWidget> FNumericCustomization::MakeChildWidget(TSharedRef<IPropertyH
         else if (EnumClass == UIntProperty::StaticClass())
             return MakeNumericWidget<int32>(StructurePropertyHandle, PropertyHandle);
     }
+
+    return SNullWidget::NullWidget;
 }
 
 void FNumericCustomization::GetSortedChildren(TSharedRef<IPropertyHandle> StructPropertyHandle, TArray<TSharedRef<IPropertyHandle>>& Children)
