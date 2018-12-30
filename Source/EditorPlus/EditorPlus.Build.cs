@@ -29,36 +29,25 @@ public class EditorPlus : ModuleRules
 				"CoreUObject",
 				"Engine",
                 "Landscape",
-			    "LandscapeEditor",
-                "TargetPlatform",
+			    "LandscapeEditor"
 			});
 		
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"AssetTools",
-				"BlueprintGraph",
-				"CollectionManager",
-				"ContentBrowser",
 				"EditorStyle",
                 "Foliage",
 				"GraphEditor",
 				"InputCore",
 				"Json",
                 "JsonUtilities",
-				"KismetCompiler",
-                "MainFrame",
                 "MaterialEditor",
                 "MaterialUtilities",
-                "MeshDescription",
-                "MeshDescriptionOperations",
 				"PropertyEditor",
                 "RawMesh",
-				"SandboxFile",
 				"Slate",
 				"SlateCore",				
-				"UnrealEd",
-				"WorkspaceMenuStructure",
+				"UnrealEd"
 			});
 	}
 }
