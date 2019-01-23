@@ -20,8 +20,8 @@ public class EditorPlus : ModuleRules
 				    "EditorPlus/Private/Validation",
 			    });
 		}
-		
-		PublicDependencyModuleNames.AddRange(
+
+        PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
 			    "AssetRegistry",

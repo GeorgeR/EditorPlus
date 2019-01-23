@@ -19,5 +19,11 @@ public:
     static bool MoveActorsToFolder(TArray<AActor*> Actors, FName Path);
 
     UFUNCTION(BlueprintCallable, Category = "Editor Scripting | Level Utility")
-    static FString CurrentLevelName();
+    static FString GetCurrentLevelPath();
+
+	UFUNCTION(BlueprintCallable, Category = "Editor Scripting | Level Utility")
+	static void AddStreamingLevel(const FName& Path);
+
+	UFUNCTION(BlueprintCallable, Category = "Editor Scripting | Level Utility")
+	static TArray<AActor*> GetActorsInSublevel(const FName& SublevelPath);
 };

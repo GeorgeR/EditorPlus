@@ -4,15 +4,72 @@
 #include "LandscapeProxy.h"
 #include "LandscapeInfo.h"
 #include "LandscapeEdit.h"
-#include "LandscapeEditor/Public/LandscapeEditorUtils.h"
+#include "LandscapeEditorUtils.h"
 #include "Foliage/Public/InstancedFoliageActor.h"
 #include "LandscapeSplinesComponent.h"
 #include "Editor.h"
-#include "LandscapeEditor/Private/LandscapeEdMode.h"
+#include "LandscapeFileFormatInterface.h"
+#include "LandscapeEditorModule.h"
 
-void UEditorLandscapeLibrary::ImportHeightmap(ALandscapeProxy* Landscape, const FString& FilePath, bool bResize /*= true*/)
+void UEditorLandscapeLibrary::ImportHeightmap(ALandscapeProxy* Landscape, const FString& FilePath /*= TEXT("")*/)
 {
+	auto ActualPath = FilePath.IsEmpty() ? Landscape->ReimportHeightmapFilePath : FilePath;
+	if (ActualPath.IsEmpty())
+		return;
 
+	auto LandscapeSize = Landscape->GetBoundingRect();
+	int32 NumSamplesX = LandscapeSize.Width() + 1;
+	int32 NumSamplesY = LandscapeSize.Height() + 1;
+
+	TArray<uint16> RawData;
+	ReadHeightmapFile(RawData, *ActualPath, NumSamplesX, NumSamplesY);
+	LandscapeEditorUtils::SetHeightmapData(Landscape, RawData);
+}
+
+void UEditorLandscapeLibrary::ImportWeightmap(ALandscapeProxy* Landscape, const FString& LayerName, const FString& FilePath /*= TEXT("")*/)
+{
+	FName LayerName_ = FName(*LayerName);
+	for (auto& LayerSettings : Landscape->EditorLayerSettings)
+	{
+		if (LayerSettings.LayerInfoObj && (LayerSettings.LayerInfoObj->LayerName == LayerName_))
+		{
+			auto ActualPath = FilePath.IsEmpty() ? LayerSettings.ReimportLayerFilePath : FilePath;
+			if (ActualPath.IsEmpty())
+				return;
+
+			auto LandscapeSize = Landscape->GetBoundingRect();
+			int32 NumSamplesX = LandscapeSize.Width() + 1;
+			int32 NumSamplesY = LandscapeSize.Height() + 1;
+
+			TArray<uint8> RawData;
+			ReadWeightmapFile(RawData, *ActualPath, LayerSettings.LayerInfoObj->LayerName, NumSamplesX, NumSamplesY);
+			LandscapeEditorUtils::SetWeightmapData(Landscape, LayerSettings.LayerInfoObj, RawData);
+		}
+	}
+}
+
+void UEditorLandscapeLibrary::ReimportMaps(ALandscapeProxy* Landscape)
+{
+	auto LandscapeSize = Landscape->GetBoundingRect();
+	int32 NumSamplesX = LandscapeSize.Width() + 1;
+	int32 NumSamplesY = LandscapeSize.Height() + 1;
+
+	if (!Landscape->ReimportHeightmapFilePath.IsEmpty() && FPaths::FileExists(Landscape->ReimportHeightmapFilePath))
+	{
+		TArray<uint16> RawData;
+		ReadHeightmapFile(RawData, *Landscape->ReimportHeightmapFilePath, NumSamplesX, NumSamplesY);
+		LandscapeEditorUtils::SetHeightmapData(Landscape, RawData);
+	}
+
+	for (auto& LayerSettings : Landscape->EditorLayerSettings)
+	{
+		if (LayerSettings.LayerInfoObj && FPaths::FileExists(LayerSettings.ReimportLayerFilePath))
+		{
+			TArray<uint8> RawData;
+			ReadWeightmapFile(RawData, *LayerSettings.ReimportLayerFilePath, LayerSettings.LayerInfoObj->LayerName, NumSamplesX, NumSamplesY);
+			LandscapeEditorUtils::SetWeightmapData(Landscape, LayerSettings.LayerInfoObj, RawData);
+		}
+	}
 }
 
 ALandscape* UEditorLandscapeLibrary::ResizeLandscape(ALandscapeProxy* Landscape, const int32 ComponentCount, const int32 SectionsPerComponent, const int32 QuadsPerSection)
@@ -168,4 +225,58 @@ ALandscape* UEditorLandscapeLibrary::ResizeLandscape(ALandscapeProxy* Landscape,
     }
 
     return nullptr;
+}
+
+void UEditorLandscapeLibrary::SetLocationZ(ALandscapeProxy* Landscape, const float LocationZ)
+{
+
+}
+
+bool UEditorLandscapeLibrary::ReadHeightmapFile(TArray<uint16>& Result, const FString& Filename, int32 ExpectedWidth, int32 ExpectedHeight)
+{
+	bool bResult = true;
+
+	ILandscapeEditorModule& LandscapeEditorModule = FModuleManager::GetModuleChecked<ILandscapeEditorModule>("LandscapeEditor");
+	const ILandscapeHeightmapFileFormat* HeightmapFormat = LandscapeEditorModule.GetHeightmapFormatByExtension(*FPaths::GetExtension(Filename, true));
+
+	FLandscapeHeightmapImportData ImportData = HeightmapFormat->Import(*Filename, { (uint32)ExpectedWidth, (uint32)ExpectedHeight });
+	if (ImportData.ResultCode != ELandscapeImportResult::Error)
+	{
+		Result = MoveTemp(ImportData.Data);
+	}
+	else
+	{
+		UE_LOG(LogStreaming, Warning, TEXT("%s"), *ImportData.ErrorMessage.ToString());
+		Result.Empty();
+		bResult = false;
+	}
+
+	return bResult;
+}
+
+bool UEditorLandscapeLibrary::ReadWeightmapFile(TArray<uint8>& Result, const FString& Filename, FName LayerName, int32 ExpectedWidth, int32 ExpectedHeight)
+{
+	bool bResult = true;
+
+	ILandscapeEditorModule& LandscapeEditorModule = FModuleManager::GetModuleChecked<ILandscapeEditorModule>("LandscapeEditor");
+	const ILandscapeWeightmapFileFormat* WeightmapFormat = LandscapeEditorModule.GetWeightmapFormatByExtension(*FPaths::GetExtension(Filename, true));
+
+	FLandscapeWeightmapImportData ImportData = WeightmapFormat->Import(*Filename, LayerName, { (uint32)ExpectedWidth, (uint32)ExpectedHeight });
+	if (ImportData.ResultCode != ELandscapeImportResult::Error)
+	{
+		Result = MoveTemp(ImportData.Data);
+	}
+	else
+	{
+		UE_LOG(LogStreaming, Warning, TEXT("%s"), *ImportData.ErrorMessage.ToString());
+		Result.Empty();
+		bResult = false;
+	}
+
+	return bResult;
+}
+
+void UEditorLandscapeLibrary::SetLevelPosition(const FIntVector& Position)
+{
+
 }
