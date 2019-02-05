@@ -20,4 +20,7 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "Editor Scripting | Level Utility")
     static FString CurrentLevelName();
+
+    UFUNCTION(BlueprintCallable, Category = "Editor Scripting | Level Utility")
+    static void SetWorldOrigin(const int32& X, const int32& Y, const int32& Z);
 };

@@ -43,6 +43,7 @@ public class EditorPlus : ModuleRules
                 "JsonUtilities",
                 "MaterialEditor",
                 "MaterialUtilities",
+                "MeshDescription",
 				"PropertyEditor",
                 "RawMesh",
 				"Slate",

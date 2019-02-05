@@ -1,6 +1,7 @@
 #include "EditorStaticMeshLibrary2.h"
 #include "Engine/StaticMesh.h"
 #include "Materials/MaterialInterface.h"
+#include "MeshDescription.h"
 
 TArray<FString> UEditorStaticMeshLibrary2::GetMaterialSlots(UStaticMesh* Object)
 {
@@ -47,4 +48,30 @@ void UEditorStaticMeshLibrary2::SetMeshBuildSettings(UStaticMesh* Object, bool b
     Object->Build(false);
     Object->PostEditChange();
     Object->MarkPackageDirty();
+}
+
+void UEditorStaticMeshLibrary2::SetUVConstant(UStaticMesh* Object, const uint8& Channel, const FVector2D& UV)
+{
+    check(Object);
+
+    auto LODCount = Object->GetNumLODs();
+    for (auto LODIndex = 0; LODIndex < LODCount; LODIndex++)
+    {
+        if (Object->GetNumUVChannels(LODIndex) - 1 != Channel)
+        {
+            auto bChannelWasAdded = Object->InsertUVChannel(LODIndex, Channel);
+            if (!bChannelWasAdded)
+            {
+                while (Object->GetNumUVChannels(LODIndex) - 1 < Channel)
+                    bChannelWasAdded = Object->AddUVChannel(LODIndex);
+            }
+        }
+
+        auto MeshDescription = Object->GetOriginalMeshDescription(LODIndex);
+
+        TArray<FVector2D> TexCoords;
+        TexCoords.Init(UV, MeshDescription->VertexInstances().Num());
+
+        Object->SetUVChannel(LODIndex, Channel, TexCoords);
+    }
 }

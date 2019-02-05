@@ -26,4 +26,8 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "Editor Scripting | StaticMesh")
     static void SetMeshBuildSettings(UStaticMesh* Object, bool bRecomputeTangents, bool bRecomputeNormals);
+
+    /* For encoding an entire mesh as a "pixel" in a UV */
+    UFUNCTION(BlueprintCallable, Category = "Editor Scripting | StaticMesh")
+    static void SetUVConstant(UStaticMesh* Object, const uint8& Channel, const FVector2D& UV);
 };

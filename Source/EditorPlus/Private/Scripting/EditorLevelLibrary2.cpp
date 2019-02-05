@@ -49,3 +49,11 @@ FString UEditorLevelLibrary2::CurrentLevelName()
     Result = Result.Append("'");
     return Result;
 }
+
+void UEditorLevelLibrary2::SetWorldOrigin(const int32& X, const int32& Y, const int32& Z)
+{
+    auto World = GetEditorWorld();
+    check(World);
+
+    World->SetNewWorldOrigin(FIntVector(X, Y, Z));
+}
