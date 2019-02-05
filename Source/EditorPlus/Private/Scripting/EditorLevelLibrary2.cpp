@@ -2,6 +2,8 @@
 #include "EditorActorFolders.h"
 #include "Editor.h"
 #include "FileHelpers.h"
+#include "EditorLevelUtils.h"
+#include "Engine/LevelStreamingAlwaysLoaded.h"
 
 UWorld* GetEditorWorld()
 {
@@ -39,7 +41,7 @@ bool UEditorLevelLibrary2::MoveActorsToFolder(TArray<AActor*> Actors, FName Path
     return true;
 }
 
-FString UEditorLevelLibrary2::CurrentLevelName()
+FString UEditorLevelLibrary2::GetCurrentLevelPath()
 {
     auto World = GetEditorWorld();
     check(World);
@@ -56,4 +58,17 @@ void UEditorLevelLibrary2::SetWorldOrigin(const int32& X, const int32& Y, const 
     check(World);
 
     World->SetNewWorldOrigin(FIntVector(X, Y, Z));
+}
+
+void UEditorLevelLibrary2::AddStreamingLevel(const FName& Path)
+{
+	auto World = GetEditorWorld();
+	UEditorLevelUtils::AddLevelToWorld(World, *Path.ToString(), ULevelStreamingAlwaysLoaded::StaticClass());
+}
+
+TArray<AActor*> UEditorLevelLibrary2::GetActorsInSublevel(const FName& SublevelPath)
+{
+	TArray<AActor*> Result;
+
+	return Result;
 }
