@@ -48,7 +48,8 @@ public class EditorPlus : ModuleRules
                 "RawMesh",
 				"Slate",
 				"SlateCore",				
-				"UnrealEd"
+				"UnrealEd",
+                "WorldBrowser"
 			});
 	}
 }

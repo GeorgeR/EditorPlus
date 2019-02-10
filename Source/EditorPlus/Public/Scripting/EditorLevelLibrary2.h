@@ -32,4 +32,34 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "Editor Scripting | Level Utility")
     static TArray<AActor*> GetActorsInSublevel(const FName& SublevelPath);
+
+	UFUNCTION(BlueprintCallable, Category = "Editor Scripting | Level Utility")
+	static TArray<FString> GetSubLevels();
+
+	UFUNCTION(BlueprintCallable, Category = "Editor Scripting | Level Utility")
+	static TArray<ULevel*> LoadSubLevels(const TArray<FString>& Paths);
+
+	UFUNCTION(BlueprintCallable, Category = "Editor Scripting | Level Utility")
+	static ULevel* LoadSubLevel(const FString& Path);
+
+	UFUNCTION(BlueprintCallable, Category = "Editor Scripting | Level Utility")
+	static void UnloadSubLevels(const TArray<ULevel*>& Levels, bool bSaveIfDirty = true);
+
+	UFUNCTION(BlueprintCallable, Category = "Editor Scripting | Level Utility")
+	static TArray<FIntPoint> GetSubLevelPositions(const TArray<ULevel*>& Levels);
+
+	UFUNCTION(BlueprintCallable, Category = "Editor Scripting | Level Utility")
+	static FIntPoint GetSubLevelPosition(ULevel* Level);
+
+	UFUNCTION(BlueprintCallable, Category = "Editor Scripting | Level Utility")
+	static void SetSubLevelPositions(const TArray<ULevel*>& Levels, const FIntPoint& Position);
+
+	UFUNCTION(BlueprintCallable, Category = "Editor Scripting | Level Utility")
+	static void SetSubLevelPosition(ULevel* Levels, const FIntPoint& Position);
+
+	UFUNCTION(BlueprintCallable, Category = "Editor Scripting | Level Utility")
+	static void Test();
+
+private:
+
 };
