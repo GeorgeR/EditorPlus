@@ -313,6 +313,7 @@ void UEditorLevelLibrary2::Test()
 	if (WorldModel.IsValid())
 	{
 		auto& Levels = WorldModel->GetAllLevels();
+		//CollectGarbage(EObjectFlags::RF_NoFlags)
 
 		auto o = 123;
 	}
