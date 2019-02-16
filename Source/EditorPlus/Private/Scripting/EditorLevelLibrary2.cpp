@@ -13,6 +13,7 @@
 #include "WorldBrowserModule.h"
 
 #include "Private/LevelCollectionModel.h"
+#include "Private/LevelModel.h"
 
 UWorld* GetEditorWorld()
 {
@@ -305,16 +306,63 @@ void UEditorLevelLibrary2::SetSubLevelPosition(ULevel* Levels, const FIntPoint& 
 
 void UEditorLevelLibrary2::Test()
 {
-	auto World = GetEditorWorld();
-	check(World);
 
-	FWorldBrowserModule& WorldBrowserModule = FModuleManager::LoadModuleChecked<FWorldBrowserModule>(TEXT("WorldBrowser"));
-	auto WorldModel = WorldBrowserModule.SharedWorldModel(World);
-	if (WorldModel.IsValid())
-	{
-		auto& Levels = WorldModel->GetAllLevels();
-		//CollectGarbage(EObjectFlags::RF_NoFlags)
+}
 
-		auto o = 123;
-	}
+FIntPoint UEditorLevelLibrary2::GetWorldSize()
+{
+    return DoForWorldModel<FIntPoint>([](TSharedPtr<FLevelCollectionModel> WorldModel) { return WorldModel->GetWorldSize(); });
+}
+
+const TArray<FString> UEditorLevelLibrary2::GetAllLevels()
+{
+    return DoForWorldModel<const TArray<FString>>([](TSharedPtr<FLevelCollectionModel> WorldModel) { return FromLevelModelList(WorldModel->GetAllLevels()); });
+}
+
+const TArray<FString> UEditorLevelLibrary2::GetSelectedLevels()
+{
+    return DoForWorldModel<const TArray<FString>>([](TSharedPtr<FLevelCollectionModel> WorldModel) { return FromLevelModelList(WorldModel->GetSelectedLevels()); });
+}
+
+template <typename T>
+T UEditorLevelLibrary2::DoForWorldModel(TFunction<T(TSharedPtr<FLevelCollectionModel>)> Func)
+{
+    auto World = GetEditorWorld();
+    check(World);
+
+    FWorldBrowserModule& WorldBrowserModule = FModuleManager::LoadModuleChecked<FWorldBrowserModule>(TEXT("WorldBrowser"));
+    auto WorldModel = WorldBrowserModule.SharedWorldModel(World);
+    ensure(WorldModel.IsValid());
+    return Func(WorldModel);
+}
+
+FLevelModelList UEditorLevelLibrary2::ToLevelModelList(const TArray<FString>& List)
+{
+    FLevelModelList Result;
+    if (List.Num() == 0)
+        return Result;
+
+    auto AllLevels = DoForWorldModel<const FLevelModelList>([](TSharedPtr<FLevelCollectionModel> WorldModel) { return WorldModel->GetAllLevels(); });
+    for (auto& Item : List)
+    {
+        auto Level = AllLevels.FindByPredicate([&](TSharedPtr<FLevelModel> LevelModel) {
+            return LevelModel->GetPackageFileName().Equals(Item);
+        });
+        
+        if (Level != nullptr)
+            Result.Add(*Level);
+    }
+    return Result;
+}
+
+TArray<FString> UEditorLevelLibrary2::FromLevelModelList(const FLevelModelList& List)
+{
+    TArray<FString> Result;
+    if (List.Num() == 0)
+        return Result;
+
+    for (auto& Item : List)
+        Result.Add(Item->GetPackageFileName());
+
+    return Result;
 }

@@ -5,6 +5,10 @@
 
 #include "EditorLevelLibrary2.generated.h"
 
+class FLevelModel;
+class FLevelCollectionModel;
+typedef TArray<TSharedPtr<FLevelModel>> FLevelModelList;
+
 UCLASS()
 class EDITORPLUS_API UEditorLevelLibrary2
     : public UBlueprintFunctionLibrary
@@ -60,6 +64,22 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Editor Scripting | Level Utility")
 	static void Test();
 
-private:
+public:
+    /** World Browser Functions */
 
+    UFUNCTION(BlueprintCallable, Category = "Editor Scripting | World Browser")
+    static FIntPoint GetWorldSize();
+
+    UFUNCTION(BlueprintCallable, Category = "Editor Scripting | World Browser")
+    static const TArray<FString> GetAllLevels();
+
+    UFUNCTION(BlueprintCallable, Category = "Editor Scripting | World Browser")
+    static const TArray<FString> GetSelectedLevels();
+
+private:
+    template <typename T>
+    static T DoForWorldModel(TFunction<T(TSharedPtr<FLevelCollectionModel>)> Func);
+
+    static FLevelModelList ToLevelModelList(const TArray<FString>& List);
+    static TArray<FString> FromLevelModelList(const FLevelModelList& List);
 };
