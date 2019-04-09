@@ -70,13 +70,30 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Editor Scripting | World Browser")
     static FIntPoint GetWorldSize();
 
+	UFUNCTION(BlueprintCallable, Category = "Editor Scripting | World Browser")
+	static void LoadLevel(const FString& Level);
+
+	UFUNCTION(BlueprintCallable, Category = "Editor Scripting | World Browser")
+	static void LoadLevels(const TArray<FString>& Levels);
+
+	UFUNCTION(BlueprintCallable, Category = "Editor Scripting | World Browser")
+	static void UnloadLevels(const TArray<FString>& Levels);
+
     UFUNCTION(BlueprintCallable, Category = "Editor Scripting | World Browser")
     static const TArray<FString> GetAllLevels();
 
     UFUNCTION(BlueprintCallable, Category = "Editor Scripting | World Browser")
     static const TArray<FString> GetSelectedLevels();
 
+	UFUNCTION(BlueprintCallable, Category = "Editor Scripting | World Browser")
+	static FIntVector GetLevelLocation(const FString& Level);
+
+	UFUNCTION(BlueprintCallable, Category = "Editor Scripting | World Browser")
+	static void SetLevelLocation(const FString& Level, const FIntVector& Location);
+
 private:
+	static void DoForWorldModel(TFunction<void(TSharedPtr<FLevelCollectionModel>)> Func);
+
     template <typename T>
     static T DoForWorldModel(TFunction<T(TSharedPtr<FLevelCollectionModel>)> Func);
 

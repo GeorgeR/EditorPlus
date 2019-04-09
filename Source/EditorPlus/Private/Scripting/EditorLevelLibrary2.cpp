@@ -14,6 +14,8 @@
 
 #include "Private/LevelCollectionModel.h"
 #include "Private/LevelModel.h"
+#include "Private/Tiles/WorldTileModel.h"
+#include "Private/Tiles/WorldTileDetails.h"
 
 UWorld* GetEditorWorld()
 {
@@ -314,6 +316,39 @@ FIntPoint UEditorLevelLibrary2::GetWorldSize()
     return DoForWorldModel<FIntPoint>([](TSharedPtr<FLevelCollectionModel> WorldModel) { return WorldModel->GetWorldSize(); });
 }
 
+void UEditorLevelLibrary2::LoadLevel(const FString& Level)
+{
+	TArray<FString> Levels;
+	Levels.Add(Level);
+
+	return LoadLevels(Levels);
+}
+
+void UEditorLevelLibrary2::LoadLevels(const TArray<FString>& Levels)
+{
+	auto LevelModels = ToLevelModelList(Levels);
+	if (LevelModels.Num() <= 0)
+		return;
+
+	DoForWorldModel([&](TSharedPtr<FLevelCollectionModel> WorldModel)
+	{
+		WorldModel->LoadLevels(LevelModels);
+	});
+}
+
+void UEditorLevelLibrary2::UnloadLevels(const TArray<FString>& Levels)
+{
+	auto LevelModels = ToLevelModelList(Levels);
+	if (LevelModels.Num() <= 0)
+		return;
+
+	DoForWorldModel([&](TSharedPtr<FLevelCollectionModel> WorldModel)
+	{
+		WorldModel->SaveLevels(LevelModels);
+		WorldModel->UnloadLevels(LevelModels);
+	});
+}
+
 const TArray<FString> UEditorLevelLibrary2::GetAllLevels()
 {
     return DoForWorldModel<const TArray<FString>>([](TSharedPtr<FLevelCollectionModel> WorldModel) { return FromLevelModelList(WorldModel->GetAllLevels()); });
@@ -322,6 +357,56 @@ const TArray<FString> UEditorLevelLibrary2::GetAllLevels()
 const TArray<FString> UEditorLevelLibrary2::GetSelectedLevels()
 {
     return DoForWorldModel<const TArray<FString>>([](TSharedPtr<FLevelCollectionModel> WorldModel) { return FromLevelModelList(WorldModel->GetSelectedLevels()); });
+}
+
+FIntVector UEditorLevelLibrary2::GetLevelLocation(const FString& Level)
+{
+	TArray<FString> Levels;
+	Levels.Add(Level);
+
+	auto LevelModels = ToLevelModelList(Levels);
+	if (LevelModels.Num() <= 0)
+		return FIntVector::ZeroValue;
+
+	auto TileModel = StaticCastSharedPtr<FWorldTileModel>(LevelModels[0]);
+	if (TileModel.IsValid())
+	{
+		if (TileModel->TileDetails != nullptr)
+			return TileModel->TileDetails->Position;
+	}
+
+	return FIntVector::ZeroValue;
+}
+
+void UEditorLevelLibrary2::SetLevelLocation(const FString& Level, const FIntVector& Location)
+{
+	TArray<FString> Levels;
+	Levels.Add(Level);
+
+	auto LevelModels = ToLevelModelList(Levels);
+	if (LevelModels.Num() <= 0)
+		return;
+
+	auto TileModel = StaticCastSharedPtr<FWorldTileModel>(LevelModels[0]);
+	if (TileModel.IsValid())
+	{
+		if (TileModel->TileDetails != nullptr)
+		{
+			TileModel->TileDetails->Position = Location;
+			TileModel->TileDetails->PositionChangedEvent.Broadcast();
+		}	
+	}
+}
+
+void UEditorLevelLibrary2::DoForWorldModel(TFunction<void(TSharedPtr<FLevelCollectionModel>)> Func)
+{
+	auto World = GetEditorWorld();
+	check(World);
+
+	FWorldBrowserModule& WorldBrowserModule = FModuleManager::LoadModuleChecked<FWorldBrowserModule>(TEXT("WorldBrowser"));
+	auto WorldModel = WorldBrowserModule.SharedWorldModel(World);
+	ensure(WorldModel.IsValid());
+	Func(WorldModel);
 }
 
 template <typename T>

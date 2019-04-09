@@ -17,4 +17,10 @@ class EDITORPLUS_API UEditorAssetLibrary2
 public:
     UFUNCTION(BlueprintCallable, Category = "Editor Scripting | Asset")
     static UStringAssetUserData* GetOrAddStringUserData(UObject* Object);
+
+	UFUNCTION(BlueprintCallable, Category = "Editor Scripting | Asset")
+	static TArray<UObject*> GetSelected();
+
+	UFUNCTION(BlueprintCallable, Category = "Editor Scripting | Asset", meta = (DisplayName = "Rename"))
+	static void RenameAsset(UObject* Asset, const FString& NewName);
 };

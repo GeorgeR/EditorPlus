@@ -1,3 +1,4 @@
+using System.IO;
 using UnrealBuildTool;
 
 public class EditorPlus : ModuleRules
@@ -20,6 +21,14 @@ public class EditorPlus : ModuleRules
 				    "EditorPlus/Private/Validation",
 			    });
 		}
+
+        var EnginePath = Path.GetFullPath(Target.RelativeEnginePath);
+        var EditorPath = Path.Combine(EnginePath, "Source", "Editor");
+
+        PrivateIncludePaths.AddRange(
+            new string[] {
+                Path.Combine(EditorPath, "WorldBrowser", "Private")
+            });
 
         PublicDependencyModuleNames.AddRange(
 			new string[]
