@@ -1,4 +1,5 @@
-#include "EditorLevelLibrary2.h"
+#include "Scripting/EditorLevelLibrary2.h"
+
 #include "EditorActorFolders.h"
 #include "Editor.h"
 #include "FileHelpers.h"
@@ -8,8 +9,7 @@
 #include "Engine/WorldComposition.h"
 #include "GameFramework/WorldSettings.h"
 #include "Engine/LevelStreamingDynamic.h"
-#include "EditorObjectLibrary.h"
-
+//#include "EditorObjectLibrary.h"
 #include "WorldBrowserModule.h"
 
 #include "Private/LevelCollectionModel.h"
