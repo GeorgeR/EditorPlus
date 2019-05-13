@@ -16,7 +16,7 @@ class EDITORPLUS_API UEditorStaticMeshLibrary2
 
 public:
     UFUNCTION(BlueprintCallable, Category = "Editor Scripting | StaticMesh")
-    static TArray<FString> GetMaterialSlots(UStaticMesh* Object);
+    static TArray<FString> GetMaterialSlots(UStaticMesh* Object, bool bOnlyUnset = false);
 
     UFUNCTION(BlueprintCallable, Category = "Editor Scripting | StaticMesh", meta = (DisplayName = "SetMaterialSlot"))
     static void SetMaterialSlot_ByName(UStaticMesh* Object, const FString& Name, UMaterialInterface* Material);

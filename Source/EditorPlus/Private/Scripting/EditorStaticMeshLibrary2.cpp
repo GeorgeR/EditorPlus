@@ -4,13 +4,14 @@
 #include "Materials/MaterialInterface.h"
 #include "MeshDescription.h"
 
-TArray<FString> UEditorStaticMeshLibrary2::GetMaterialSlots(UStaticMesh* Object)
+TArray<FString> UEditorStaticMeshLibrary2::GetMaterialSlots(UStaticMesh* Object, bool bOnlyUnset)
 {
     check(Object);
 
     TArray<FString> Result;
     for (auto& Material : Object->StaticMaterials)
-        Result.Add(Material.MaterialSlotName.ToString());
+        if(bOnlyUnset && Material.MaterialInterface == nullptr)
+            Result.Add(Material.MaterialSlotName.ToString());
     
     return Result;
 }
