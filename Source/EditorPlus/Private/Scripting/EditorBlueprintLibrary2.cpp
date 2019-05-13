@@ -4,65 +4,42 @@
 #include "Engine/BlueprintGeneratedClass.h"
 #include "Engine/SCS_Node.h"
 
-UActorComponent* UEditorBlueprintLibrary2::FindDefaultComponentByClass(TSubclassOf<AActor> ActorClass, const TSubclassOf<UActorComponent> ComponentClass)
+UActorComponent* UEditorBlueprintLibrary2::FindDefaultComponentByClass(UObject* Blueprint, const TSubclassOf<UActorComponent> ComponentClass)
 {
-    if (!IsValid(ActorClass))
+    if (!IsValid(Blueprint))
         return nullptr;
 
     if (!IsValid(ComponentClass))
         return nullptr;
 
-    auto ActorCDO = ActorClass->GetDefaultObject<AActor>();
-    auto FoundComponent = ActorCDO->FindComponentByClass(ComponentClass);
+    auto BlueprintGeneratedClass = Cast<UBlueprintGeneratedClass>(Cast<UBlueprint>(Blueprint)->GeneratedClass.Get());
+    check(BlueprintGeneratedClass);
 
-    if (FoundComponent != nullptr)
-        return FoundComponent;
-
-    auto RootBlueprintGeneratedClass = Cast<UBlueprintGeneratedClass>(ActorClass);
-    do 
-    {
-        auto ActorBlueprintGeneratedClass = Cast<UBlueprintGeneratedClass>(ActorClass);
-        if (!ActorBlueprintGeneratedClass)
-            return nullptr;
-
-        const TArray<USCS_Node*>& ActorBlueprintNodes = ActorBlueprintGeneratedClass->SimpleConstructionScript->GetAllNodes();
-        for (auto& Node : ActorBlueprintNodes)
-            if (Node->ComponentClass->IsChildOf(ComponentClass))
-                return Node->GetActualComponentTemplate(RootBlueprintGeneratedClass);
-
-        ActorClass = Cast<UClass>(ActorClass->GetSuperStruct());
-    } while (ActorClass != AActor::StaticClass());
+    const TArray<USCS_Node*>& ActorBlueprintNodes = BlueprintGeneratedClass->SimpleConstructionScript->GetAllNodes();
+    for (auto& Node : ActorBlueprintNodes)
+        if (Node->ComponentClass->IsChildOf(ComponentClass))
+            return Node->GetActualComponentTemplate(BlueprintGeneratedClass);
 
     return nullptr;
 }
 
-TArray<UActorComponent*> UEditorBlueprintLibrary2::FindDefaultComponentsByClass(TSubclassOf<AActor> ActorClass, const TSubclassOf<UActorComponent> ComponentClass)
+TArray<UActorComponent*> UEditorBlueprintLibrary2::FindDefaultComponentsByClass(UObject* Blueprint, const TSubclassOf<UActorComponent> ComponentClass)
 {
     TArray<UActorComponent*> Result;
 
-    if (!IsValid(ActorClass))
+    if (!IsValid(Blueprint))
         return Result;
 
     if (!IsValid(ComponentClass))
         return Result;
 
-    auto ActorCDO = ActorClass->GetDefaultObject<AActor>();
-    Result = ActorCDO->GetComponentsByClass(ComponentClass);
+    auto BlueprintGeneratedClass = Cast<UBlueprintGeneratedClass>(Cast<UBlueprint>(Blueprint)->GeneratedClass.Get());
+    check(BlueprintGeneratedClass);
 
-    auto RootBlueprintGeneratedClass = Cast<UBlueprintGeneratedClass>(ActorClass);
-    do
-    {
-        auto ActorBlueprintGeneratedClass = Cast<UBlueprintGeneratedClass>(ActorClass);
-        if (!ActorBlueprintGeneratedClass)
-            return Result;
-
-        const TArray<USCS_Node*>& ActorBlueprintNodes = ActorBlueprintGeneratedClass->SimpleConstructionScript->GetAllNodes();
-        for (auto& Node : ActorBlueprintNodes)
-            if (Node->ComponentClass->IsChildOf(ComponentClass))
-                Result.Add(Node->GetActualComponentTemplate(RootBlueprintGeneratedClass));
-
-        ActorClass = Cast<UClass>(ActorClass->GetSuperStruct());
-    } while (ActorClass != AActor::StaticClass());
+    const TArray<USCS_Node*>& ActorBlueprintNodes = BlueprintGeneratedClass->SimpleConstructionScript->GetAllNodes();
+    for (auto& Node : ActorBlueprintNodes)
+        if (Node->ComponentClass->IsChildOf(ComponentClass))
+            Result.Add(Node->GetActualComponentTemplate(BlueprintGeneratedClass));
 
     return Result;
 }
