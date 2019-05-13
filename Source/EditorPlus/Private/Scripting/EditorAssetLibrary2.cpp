@@ -1,4 +1,4 @@
-#include "EditorAssetLibrary2.h"
+#include "Scripting/EditorAssetLibrary2.h"
 
 #include "Interfaces/Interface_AssetUserData.h"
 #include "StringAssetUserData.h"

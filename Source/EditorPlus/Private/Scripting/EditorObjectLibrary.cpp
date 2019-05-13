@@ -1,4 +1,4 @@
-#include "EditorObjectLibrary.h"
+#include "Scripting/EditorObjectLibrary.h"
 
 void UEditorObjectLibrary::AddToRoot(UObject* Object)
 {
