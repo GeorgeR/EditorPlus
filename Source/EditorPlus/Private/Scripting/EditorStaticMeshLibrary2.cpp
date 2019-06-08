@@ -67,7 +67,11 @@ void UEditorStaticMeshLibrary2::SetUVConstant(UStaticMesh* Object, const uint8& 
             }
         }
 
+#if (ENGINE_MINOR_VERSION <= 21)
         auto MeshDescription = Object->GetOriginalMeshDescription(LODIndex);
+#else
+		auto MeshDescription = Object->GetMeshDescription(LODIndex);
+#endif
 
         TArray<FVector2D> TexCoords;
         TexCoords.Init(UV, MeshDescription->VertexInstances().Num());
