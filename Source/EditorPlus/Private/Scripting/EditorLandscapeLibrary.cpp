@@ -1,4 +1,4 @@
-#include "EditorLandscapeLibrary.h"
+#include "Scripting/EditorLandscapeLibrary.h"
 
 #include "Landscape.h"
 #include "LandscapeProxy.h"

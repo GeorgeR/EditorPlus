@@ -1,4 +1,4 @@
-#include "EditorMaterialLibrary.h"
+#include "Scripting/EditorMaterialLibrary.h"
 
 #include "Materials/MaterialInterface.h"
 
