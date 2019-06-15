@@ -2,11 +2,11 @@
 
 #include "CoreUObject.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
-#include "AssetData.h"
 
 #include "EditorStaticMeshLibrary2.generated.h"
 
 class UStaticMesh;
+class UMaterialInterface;
 
 UCLASS()
 class EDITORPLUS_API UEditorStaticMeshLibrary2
