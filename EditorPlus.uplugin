@@ -1,23 +1,23 @@
 {
-	"FileVersion": 3,
-	"Version": 1,
-	"VersionName": "1.0",
-	"FriendlyName": "EditorPlus",
-	"Description": "Extensions and utilities for the UE4 Editor",
-	"Category": "Editor",
-	"CreatedBy": "George Rolfe",
-	"CreatedByURL": "",
-	"DocsURL": "https://github.com/georger/editorplus",
-	"MarketplaceURL": "",
-	"SupportURL": "",
-	"CanContainContent": true,
-	"IsBetaVersion": false,
-	"Installed": false,
-	"Modules": [
-		{
-			"Name": "EditorPlus",
-			"Type": "Editor",
-			"LoadingPhase": "Default"
-		}
-	]
+  "FileVersion": 3,
+  "Version": 1,
+  "VersionName": "1.0",
+  "FriendlyName": "EditorPlus",
+  "Description": "Extensions and utilities for the UE4 Editor",
+  "Category": "Editor",
+  "CreatedBy": "George Rolfe",
+  "CreatedByURL": "",
+  "DocsURL": "https://github.com/georger/editorplus",
+  "MarketplaceURL": "",
+  "SupportURL": "",
+  "CanContainContent": true,
+  "IsBetaVersion": false,
+  "Installed": false,
+  "Modules": [
+    {
+      "Name": "EditorPlus",
+      "Type": "Editor",
+      "LoadingPhase": "PostEngineInit"
+    }
+  ]
 }
