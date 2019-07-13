@@ -10,6 +10,15 @@ class FLevelCollectionModel;
 typedef TArray<TSharedPtr<FLevelModel>> FLevelModelList;
 
 UCLASS()
+class EDITORPLUS_API UEditorPlusLevelLibrary
+    : public UBlueprintFunctionLibrary
+{
+    GENERATED_BODY()
+
+public:
+};
+
+UCLASS()
 class EDITORPLUS_API UEditorLevelLibrary2
     : public UBlueprintFunctionLibrary
 {

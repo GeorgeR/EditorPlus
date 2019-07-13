@@ -11,7 +11,7 @@ TArray<FString> UEditorStaticMeshLibrary2::GetMaterialSlots(UStaticMesh* Object,
     TArray<FString> Result;
     for (auto& Material : Object->StaticMaterials)
         if(bOnlyUnset && Material.MaterialInterface == nullptr)
-        Result.Add(Material.MaterialSlotName.ToString());
+            Result.Add(Material.MaterialSlotName.ToString());
     
     return Result;
 }
@@ -69,10 +69,10 @@ void UEditorStaticMeshLibrary2::SetUVConstant(UStaticMesh* Object, const uint8& 
             }
         }
 
-#if (ENGINE_MINOR_VERSION <= 21)
-        auto MeshDescription = Object->GetOriginalMeshDescription(LODIndex);
+#if ENGINE_MINOR_VERSION >= 22
+        auto MeshDescription = Object->GetMeshDescription(LODIndex);
 #else
-		auto MeshDescription = Object->GetMeshDescription(LODIndex);
+        auto MeshDescription = Object->GetOriginalMeshDescription(LODIndex);
 #endif
 
         TArray<FVector2D> TexCoords;
