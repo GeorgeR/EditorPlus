@@ -134,7 +134,7 @@ ALandscape* UEditorLandscapeLibrary::ResizeLandscape(ALandscapeProxy* Landscape,
         NewLandscape->LandscapeMaterial = OldLandscapeProxy->LandscapeMaterial;
         NewLandscape->LandscapeMaterialsOverride = OldLandscapeProxy->LandscapeMaterialsOverride;
         NewLandscape->CollisionMipLevel = OldLandscapeProxy->CollisionMipLevel;
-        NewLandscape->Import(FGuid::NewGuid(), NewMinX, NewMinY, NewMaxX, NewMaxY, SectionsPerComponent, QuadsPerSection, HeightData.GetData(), *OldLandscapeProxy->ReimportHeightmapFilePath, ImportLayerInfos, ELandscapeImportAlphamapType::Additive);
+        //NewLandscape->Import(FGuid::NewGuid(), NewMinX, NewMinY, NewMaxX, NewMaxY, SectionsPerComponent, QuadsPerSection, HeightData.GetData(), *OldLandscapeProxy->ReimportHeightmapFilePath, ImportLayerInfos, ELandscapeImportAlphamapType::Additive);
 
         NewLandscape->MaxLODLevel = OldLandscapeProxy->MaxLODLevel;
         NewLandscape->LODDistanceFactor_DEPRECATED = OldLandscapeProxy->LODDistanceFactor_DEPRECATED;
