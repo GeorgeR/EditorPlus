@@ -76,6 +76,7 @@ ALandscape* UEditorLandscapeLibrary::ResizeLandscape(ALandscapeProxy* Landscape,
 {
     const int32 NewComponentSizeQuads = SectionsPerComponent * QuadsPerSection;
 
+    /*
     auto LandscapeInfo = Landscape->GetLandscapeInfo();
     int32 OldMinX, OldMinY, OldMaxX, OldMaxY;
     if (LandscapeInfo->GetLandscapeExtent(OldMinX, OldMinY, OldMaxX, OldMaxY)) 
@@ -223,6 +224,7 @@ ALandscape* UEditorLandscapeLibrary::ResizeLandscape(ALandscapeProxy* Landscape,
 
         return NewLandscape;
     }
+    */
 
     return nullptr;
 }

@@ -75,9 +75,10 @@ void UEditorStaticMeshLibrary2::SetUVConstant(UStaticMesh* Object, const uint8& 
         auto MeshDescription = Object->GetOriginalMeshDescription(LODIndex);
 #endif
 
-        TArray<FVector2D> TexCoords;
-        TexCoords.Init(UV, MeshDescription->VertexInstances().Num());
+        // @bug: won't compile with 4.23?
+        //TArray<FVector2D> TexCoords;
+        //TexCoords.Init(UV, MeshDescription->VertexInstances().Num());
 
-        Object->SetUVChannel(LODIndex, Channel, TexCoords);
+        //Object->SetUVChannel(LODIndex, Channel, TexCoords);
     }
 }
