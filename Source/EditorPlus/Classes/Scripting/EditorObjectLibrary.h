@@ -46,4 +46,11 @@ public:
     
     UFUNCTION(BlueprintCallable, Category = "Editor Scripting | Object")
     static void RemoveFromRoot(UObject* Object);
+
+    UFUNCTION(BlueprintCallable, Category = "Editor Plus | Object", meta = (DisplayName = "SetProperty"))
+    static bool SetProperty_Bool(UObject* Object, const FName& Name, bool Value) { return SetProperty(Object, Name, Value); }
+
+private:
+    template <typename ValueType>
+    static bool SetProperty(UObject* Object, const FName& Name, ValueType Value);
 };

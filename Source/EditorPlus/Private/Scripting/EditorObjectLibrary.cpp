@@ -13,3 +13,9 @@ void UEditorObjectLibrary::RemoveFromRoot(UObject* Object)
 
     Object->RemoveFromRoot();
 }
+
+template <typename ValueType>
+bool UEditorObjectLibrary::SetProperty(UObject* Object, const FName& Name, ValueType Value)
+{
+    return false;
+}

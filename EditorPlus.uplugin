@@ -13,6 +13,9 @@
   "CanContainContent": true,
   "IsBetaVersion": false,
   "Installed": false,
+  "PreBuildSteps": [
+    "py $(PluginDir)/version.py"
+  ],
   "Modules": [
     {
       "Name": "EditorPlus",
