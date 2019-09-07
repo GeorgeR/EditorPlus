@@ -3,31 +3,31 @@
 #include "CoreUObject.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 
-#include "EditorLandscapeLibrary.generated.h"
+#include "EditorPlusLandscapeLibrary.generated.h"
 
 class ALandscape;
 class ALandscapeProxy;
 
 UCLASS()
-class EDITORPLUS_API UEditorLandscapeLibrary 
+class EDITORPLUS_API UEditorPlusLandscapeLibrary 
     : public UBlueprintFunctionLibrary
 {
     GENERATED_BODY()
 
 public:
-    UFUNCTION(BlueprintCallable, Category = "Editor Scripting | Landscape")
+    UFUNCTION(BlueprintCallable, Category = "Editor Plus | Landscape")
     static void ImportHeightmap(ALandscapeProxy* Landscape, const FString& FilePath = TEXT(""));
 
-	UFUNCTION(BlueprintCallable, Category = "Editor Scripting | Landscape")
+	UFUNCTION(BlueprintCallable, Category = "Editor Plus | Landscape")
 	static void ImportWeightmap(ALandscapeProxy* Landscape, const FString& LayerName, const FString& FilePath = TEXT(""));
 
-	UFUNCTION(BlueprintCallable, Category = "Editor Scripting | Landscape")
+	UFUNCTION(BlueprintCallable, Category = "Editor Plus | Landscape")
 	static void ReimportMaps(ALandscapeProxy* Landscape);
 
-    UFUNCTION(BlueprintCallable, Category = "Editor Scripting | Landscape")
+    UFUNCTION(BlueprintCallable, Category = "Editor Plus | Landscape")
     static ALandscape* ResizeLandscape(ALandscapeProxy* Landscape, const int32 ComponentCount, const int32 SectionsPerComponent, const int32 QuadsPerSection);
 
-	UFUNCTION(BlueprintCallable, Category = "Editor Scripting | Landscape")
+	UFUNCTION(BlueprintCallable, Category = "Editor Plus | Landscape")
 	static void SetLocationZ(ALandscapeProxy* Landscape, const float LocationZ);
 
 private:

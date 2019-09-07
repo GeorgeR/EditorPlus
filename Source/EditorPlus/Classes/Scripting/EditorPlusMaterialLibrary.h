@@ -4,33 +4,33 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "AssetData.h"
 
-#include "EditorMaterialLibrary.generated.h"
+#include "EditorPlusMaterialLibrary.generated.h"
 
 class UMaterialInterface;
 class UTexture;
 
 UCLASS()
-class EDITORPLUS_API UEditorMaterialLibrary
+class EDITORPLUS_API UEditorPlusMaterialLibrary
     : public UBlueprintFunctionLibrary
 {
     GENERATED_BODY()
 
 public:
-    UFUNCTION(BlueprintCallable, Category = "Editor Scripting | Material", meta = (DisplayName = "CreateMaterialInstance"))
+    UFUNCTION(BlueprintCallable, Category = "Editor Plus | Material", meta = (DisplayName = "Create Material Instance (from asset path)"))
     static UMaterialInterface* CreateMaterialInstance_FromPath(const FString& BaseMaterialPath, const FString& DestinationPath);
 
-    UFUNCTION(BlueprintCallable, Category = "Editor Scripting | Material")
+    UFUNCTION(BlueprintCallable, Category = "Editor Plus | Material")
     static UMaterialInterface* CreateMaterialInstance(UMaterialInterface* BaseMaterial, const FString& DestinationPath);
 
-    UFUNCTION(BlueprintCallable, Category = "Editor Scripting | Material", meta = (DisplayName = "SetParameter"))
+    UFUNCTION(BlueprintCallable, Category = "Editor Plus | Material", meta = (DisplayName = "Set Parameter (color)"))
     static bool SetVectorParameter(UMaterialInterface* Material, const FName Name, FLinearColor Value);
 
-    UFUNCTION(BlueprintCallable, Category = "Editor Scripting | Material", meta = (DisplayName = "SetParameter"))
+    UFUNCTION(BlueprintCallable, Category = "Editor Plus | Material", meta = (DisplayName = "Set Parameter (vector)"))
     static bool SetVectorParameter_FromVector(UMaterialInterface* Material, const FName Name, FVector Value);
 
-    UFUNCTION(BlueprintCallable, Category = "Editor Scripting | Material", meta = (DisplayName = "SetParameter"))
+    UFUNCTION(BlueprintCallable, Category = "Editor Plus | Material", meta = (DisplayName = "Set Parameter (scalar)"))
     static bool SetScalarParameter(UMaterialInterface* Material, const FName Name, float Value);
 
-    UFUNCTION(BlueprintCallable, Category = "Editor Scripting | Material", meta = (DisplayName = "SetParameter"))
+    UFUNCTION(BlueprintCallable, Category = "Editor Plus | Material", meta = (DisplayName = "Set Parameter (texture)"))
     static bool SetTextureParameter(UMaterialInterface* Material, const FName Name, UTexture* Value);
 };

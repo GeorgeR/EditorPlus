@@ -1,4 +1,4 @@
-#include "Scripting/EditorMaterialLibrary.h"
+#include "Scripting/EditorPlusMaterialLibrary.h"
 
 #include "Materials/MaterialInterface.h"
 
@@ -11,13 +11,13 @@
 #include "Engine/Texture.h"
 #include "MaterialEditingLibrary.h"
 
-UMaterialInterface* UEditorMaterialLibrary::CreateMaterialInstance_FromPath(const FString& BaseMaterialPath, const FString& DestinationPath)
+UMaterialInterface* UEditorPlusMaterialLibrary::CreateMaterialInstance_FromPath(const FString& BaseMaterialPath, const FString& DestinationPath)
 {
     auto BaseMaterial = LoadObject<UMaterialInterface>(nullptr, *BaseMaterialPath);
     return CreateMaterialInstance(BaseMaterial, DestinationPath);
 }
 
-UMaterialInterface* UEditorMaterialLibrary::CreateMaterialInstance(UMaterialInterface* BaseMaterial, const FString& DestinationPath)
+UMaterialInterface* UEditorPlusMaterialLibrary::CreateMaterialInstance(UMaterialInterface* BaseMaterial, const FString& DestinationPath)
 {
     //FAssetRegistryModule& AssetRegistry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry"));
     //FAssetData AssetData = AssetRegistry.Get().GetAssetByObjectPath(FName(*DestinationPath));
@@ -50,7 +50,7 @@ UMaterialInterface* UEditorMaterialLibrary::CreateMaterialInstance(UMaterialInte
     return MaterialInstance;
 }
 
-bool UEditorMaterialLibrary::SetVectorParameter(UMaterialInterface* Material, const FName Name, FLinearColor Value)
+bool UEditorPlusMaterialLibrary::SetVectorParameter(UMaterialInterface* Material, const FName Name, FLinearColor Value)
 {
     check(Material);
 
@@ -67,12 +67,12 @@ bool UEditorMaterialLibrary::SetVectorParameter(UMaterialInterface* Material, co
     return false;
 }
 
-bool UEditorMaterialLibrary::SetVectorParameter_FromVector(UMaterialInterface* Material, const FName Name, FVector Value)
+bool UEditorPlusMaterialLibrary::SetVectorParameter_FromVector(UMaterialInterface* Material, const FName Name, FVector Value)
 {
     return SetVectorParameter(Material, Name, Value);
 }
 
-bool UEditorMaterialLibrary::SetScalarParameter(UMaterialInterface* Material, const FName Name, float Value)
+bool UEditorPlusMaterialLibrary::SetScalarParameter(UMaterialInterface* Material, const FName Name, float Value)
 {
     check(Material);
 
@@ -89,7 +89,7 @@ bool UEditorMaterialLibrary::SetScalarParameter(UMaterialInterface* Material, co
     return false;
 }
 
-bool UEditorMaterialLibrary::SetTextureParameter(UMaterialInterface* Material, const FName Name, UTexture* Value)
+bool UEditorPlusMaterialLibrary::SetTextureParameter(UMaterialInterface* Material, const FName Name, UTexture* Value)
 {
     check(Material);
     check(Value);

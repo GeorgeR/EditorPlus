@@ -1,10 +1,10 @@
-#include "Scripting/EditorBlueprintLibrary2.h"
+#include "Scripting/EditorPlusBlueprintLibrary.h"
 
 #include "GameFramework/Actor.h"
 #include "Engine/BlueprintGeneratedClass.h"
 #include "Engine/SCS_Node.h"
 
-UActorComponent* UEditorBlueprintLibrary2::FindDefaultComponentByClass(UObject* Blueprint, const TSubclassOf<UActorComponent> ComponentClass)
+UActorComponent* UEditorPlusBlueprintLibrary::FindDefaultComponentByClass(UObject* Blueprint, const TSubclassOf<UActorComponent> ComponentClass)
 {
     if (!IsValid(Blueprint))
         return nullptr;
@@ -23,7 +23,7 @@ UActorComponent* UEditorBlueprintLibrary2::FindDefaultComponentByClass(UObject* 
     return nullptr;
 }
 
-TArray<UActorComponent*> UEditorBlueprintLibrary2::FindDefaultComponentsByClass(UObject* Blueprint, const TSubclassOf<UActorComponent> ComponentClass)
+TArray<UActorComponent*> UEditorPlusBlueprintLibrary::FindDefaultComponentsByClass(UObject* Blueprint, const TSubclassOf<UActorComponent> ComponentClass)
 {
     TArray<UActorComponent*> Result;
 

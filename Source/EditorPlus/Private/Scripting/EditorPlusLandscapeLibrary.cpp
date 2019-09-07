@@ -1,4 +1,4 @@
-#include "Scripting/EditorLandscapeLibrary.h"
+#include "Scripting/EditorPlusLandscapeLibrary.h"
 
 #include "Landscape.h"
 #include "LandscapeProxy.h"
@@ -11,7 +11,7 @@
 #include "LandscapeFileFormatInterface.h"
 #include "LandscapeEditorModule.h"
 
-void UEditorLandscapeLibrary::ImportHeightmap(ALandscapeProxy* Landscape, const FString& FilePath /*= TEXT("")*/)
+void UEditorPlusLandscapeLibrary::ImportHeightmap(ALandscapeProxy* Landscape, const FString& FilePath /*= TEXT("")*/)
 {
 	auto ActualPath = FilePath.IsEmpty() ? Landscape->ReimportHeightmapFilePath : FilePath;
 	if (ActualPath.IsEmpty())
@@ -26,7 +26,7 @@ void UEditorLandscapeLibrary::ImportHeightmap(ALandscapeProxy* Landscape, const 
 	LandscapeEditorUtils::SetHeightmapData(Landscape, RawData);
 }
 
-void UEditorLandscapeLibrary::ImportWeightmap(ALandscapeProxy* Landscape, const FString& LayerName, const FString& FilePath /*= TEXT("")*/)
+void UEditorPlusLandscapeLibrary::ImportWeightmap(ALandscapeProxy* Landscape, const FString& LayerName, const FString& FilePath /*= TEXT("")*/)
 {
 	FName LayerName_ = FName(*LayerName);
 	for (auto& LayerSettings : Landscape->EditorLayerSettings)
@@ -48,7 +48,7 @@ void UEditorLandscapeLibrary::ImportWeightmap(ALandscapeProxy* Landscape, const 
 	}
 }
 
-void UEditorLandscapeLibrary::ReimportMaps(ALandscapeProxy* Landscape)
+void UEditorPlusLandscapeLibrary::ReimportMaps(ALandscapeProxy* Landscape)
 {
 	auto LandscapeSize = Landscape->GetBoundingRect();
 	int32 NumSamplesX = LandscapeSize.Width() + 1;
@@ -72,7 +72,7 @@ void UEditorLandscapeLibrary::ReimportMaps(ALandscapeProxy* Landscape)
 	}
 }
 
-ALandscape* UEditorLandscapeLibrary::ResizeLandscape(ALandscapeProxy* Landscape, const int32 ComponentCount, const int32 SectionsPerComponent, const int32 QuadsPerSection)
+ALandscape* UEditorPlusLandscapeLibrary::ResizeLandscape(ALandscapeProxy* Landscape, const int32 ComponentCount, const int32 SectionsPerComponent, const int32 QuadsPerSection)
 {
     const int32 NewComponentSizeQuads = SectionsPerComponent * QuadsPerSection;
 
@@ -227,12 +227,12 @@ ALandscape* UEditorLandscapeLibrary::ResizeLandscape(ALandscapeProxy* Landscape,
     return nullptr;
 }
 
-void UEditorLandscapeLibrary::SetLocationZ(ALandscapeProxy* Landscape, const float LocationZ)
+void UEditorPlusLandscapeLibrary::SetLocationZ(ALandscapeProxy* Landscape, const float LocationZ)
 {
 
 }
 
-bool UEditorLandscapeLibrary::ReadHeightmapFile(TArray<uint16>& Result, const FString& Filename, int32 ExpectedWidth, int32 ExpectedHeight)
+bool UEditorPlusLandscapeLibrary::ReadHeightmapFile(TArray<uint16>& Result, const FString& Filename, int32 ExpectedWidth, int32 ExpectedHeight)
 {
 	bool bResult = true;
 
@@ -254,7 +254,7 @@ bool UEditorLandscapeLibrary::ReadHeightmapFile(TArray<uint16>& Result, const FS
 	return bResult;
 }
 
-bool UEditorLandscapeLibrary::ReadWeightmapFile(TArray<uint8>& Result, const FString& Filename, FName LayerName, int32 ExpectedWidth, int32 ExpectedHeight)
+bool UEditorPlusLandscapeLibrary::ReadWeightmapFile(TArray<uint8>& Result, const FString& Filename, FName LayerName, int32 ExpectedWidth, int32 ExpectedHeight)
 {
 	bool bResult = true;
 
@@ -276,7 +276,7 @@ bool UEditorLandscapeLibrary::ReadWeightmapFile(TArray<uint8>& Result, const FSt
 	return bResult;
 }
 
-void UEditorLandscapeLibrary::SetLevelPosition(const FIntVector& Position)
+void UEditorPlusLandscapeLibrary::SetLevelPosition(const FIntVector& Position)
 {
 
 }

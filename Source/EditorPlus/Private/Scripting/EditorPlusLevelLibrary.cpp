@@ -1,4 +1,4 @@
-#include "Scripting/EditorLevelLibrary2.h"
+#include "Scripting/EditorPlusLevelLibrary.h"
 
 #include "EditorActorFolders.h"
 #include "Editor.h"
@@ -23,7 +23,7 @@ UWorld* GetEditorWorld()
 }
 
 /* Return true if it exists, false if it didn't and was created */
-bool UEditorLevelLibrary2::GetOrCreateFolder(FName Path)
+bool UEditorPlusLevelLibrary::GetOrCreateFolder(FName Path)
 {
     auto World = GetEditorWorld();
     check(World);
@@ -42,7 +42,7 @@ bool UEditorLevelLibrary2::GetOrCreateFolder(FName Path)
     return true;
 }
 
-bool UEditorLevelLibrary2::MoveActorsToFolder(TArray<AActor*> Actors, FName Path)
+bool UEditorPlusLevelLibrary::MoveActorsToFolder(TArray<AActor*> Actors, FName Path)
 {
     GetOrCreateFolder(Path);
 
@@ -53,7 +53,7 @@ bool UEditorLevelLibrary2::MoveActorsToFolder(TArray<AActor*> Actors, FName Path
     return true;
 }
 
-FString UEditorLevelLibrary2::CurrentLevelName()
+FString UEditorPlusLevelLibrary::CurrentLevelName()
 {
 	auto World = GetEditorWorld();
 	check(World);
@@ -61,7 +61,7 @@ FString UEditorLevelLibrary2::CurrentLevelName()
 	return World->GetName();
 }
 
-FString UEditorLevelLibrary2::GetCurrentLevelPath()
+FString UEditorPlusLevelLibrary::GetCurrentLevelPath()
 {
     auto World = GetEditorWorld();
     check(World);
@@ -72,7 +72,7 @@ FString UEditorLevelLibrary2::GetCurrentLevelPath()
     return Result;
 }
 
-void UEditorLevelLibrary2::SetWorldOrigin(const int32& X, const int32& Y, const int32& Z)
+void UEditorPlusLevelLibrary::SetWorldOrigin(const int32& X, const int32& Y, const int32& Z)
 {
     auto World = GetEditorWorld();
     check(World);
@@ -80,20 +80,20 @@ void UEditorLevelLibrary2::SetWorldOrigin(const int32& X, const int32& Y, const 
     World->SetNewWorldOrigin(FIntVector(X, Y, Z));
 }
 
-void UEditorLevelLibrary2::AddStreamingLevel(const FName& Path)
+void UEditorPlusLevelLibrary::AddStreamingLevel(const FName& Path)
 {
 	auto World = GetEditorWorld();
 	UEditorLevelUtils::AddLevelToWorld(World, *Path.ToString(), ULevelStreamingAlwaysLoaded::StaticClass());
 }
 
-TArray<AActor*> UEditorLevelLibrary2::GetActorsInSublevel(const FName& SublevelPath)
+TArray<AActor*> UEditorPlusLevelLibrary::GetActorsInSublevel(const FName& SublevelPath)
 {
 	TArray<AActor*> Result;
 
 	return Result;
 }
 
-TArray<FString> UEditorLevelLibrary2::GetSubLevels()
+TArray<FString> UEditorPlusLevelLibrary::GetSubLevels()
 {
 	auto World = GetEditorWorld();
 	check(World);
@@ -114,7 +114,7 @@ TArray<FString> UEditorLevelLibrary2::GetSubLevels()
 }
 
 // Based on LevelCollectionModel::LoadLevels
-TArray<ULevel*> UEditorLevelLibrary2::LoadSubLevels(const TArray<FString>& Paths)
+TArray<ULevel*> UEditorPlusLevelLibrary::LoadSubLevels(const TArray<FString>& Paths)
 {
 	auto World = GetEditorWorld();
 	check(World);
@@ -138,7 +138,7 @@ TArray<ULevel*> UEditorLevelLibrary2::LoadSubLevels(const TArray<FString>& Paths
 	return Levels;
 }
 
-ULevel* UEditorLevelLibrary2::LoadSubLevel(const FString& Path)
+ULevel* UEditorPlusLevelLibrary::LoadSubLevel(const FString& Path)
 {
 	auto World = GetEditorWorld();
 	check(World);
@@ -216,7 +216,7 @@ ULevel* UEditorLevelLibrary2::LoadSubLevel(const FString& Path)
 }
 
 // Based on LevelCollectionModel::UnloadLevels
-void UEditorLevelLibrary2::UnloadSubLevels(const TArray<ULevel*>& Levels, bool bSaveIfDirty)
+void UEditorPlusLevelLibrary::UnloadSubLevels(const TArray<ULevel*>& Levels, bool bSaveIfDirty)
 {
 	auto World = GetEditorWorld();
 	check(World);
@@ -272,7 +272,7 @@ void UEditorLevelLibrary2::UnloadSubLevels(const TArray<ULevel*>& Levels, bool b
 	CollectGarbage(GARBAGE_COLLECTION_KEEPFLAGS);
 }
 
-TArray<FIntPoint> UEditorLevelLibrary2::GetSubLevelPositions(const TArray<ULevel*>& Levels)
+TArray<FIntPoint> UEditorPlusLevelLibrary::GetSubLevelPositions(const TArray<ULevel*>& Levels)
 {
 	auto World = GetEditorWorld();
 	check(World);
@@ -281,7 +281,7 @@ TArray<FIntPoint> UEditorLevelLibrary2::GetSubLevelPositions(const TArray<ULevel
 	return Result;
 }
 
-FIntPoint UEditorLevelLibrary2::GetSubLevelPosition(ULevel* Level)
+FIntPoint UEditorPlusLevelLibrary::GetSubLevelPosition(ULevel* Level)
 {
 	auto World = GetEditorWorld();
 	check(World);
@@ -294,29 +294,29 @@ FIntPoint UEditorLevelLibrary2::GetSubLevelPosition(ULevel* Level)
 	return FIntPoint();
 }
 
-void UEditorLevelLibrary2::SetSubLevelPositions(const TArray<ULevel*>& Levels, const FIntPoint& Position)
+void UEditorPlusLevelLibrary::SetSubLevelPositions(const TArray<ULevel*>& Levels, const FIntPoint& Position)
 {
 	auto World = GetEditorWorld();
 	check(World);
 }
 
-void UEditorLevelLibrary2::SetSubLevelPosition(ULevel* Levels, const FIntPoint& Position)
+void UEditorPlusLevelLibrary::SetSubLevelPosition(ULevel* Levels, const FIntPoint& Position)
 {
 	auto World = GetEditorWorld();
 	check(World);
 }
 
-void UEditorLevelLibrary2::Test()
+void UEditorPlusLevelLibrary::Test()
 {
 
 }
 
-FIntPoint UEditorLevelLibrary2::GetWorldSize()
+FIntPoint UEditorPlusLevelLibrary::GetWorldSize()
 {
     return DoForWorldModel<FIntPoint>([](TSharedPtr<FLevelCollectionModel> WorldModel) { return WorldModel->GetWorldSize(); });
 }
 
-void UEditorLevelLibrary2::LoadLevel(const FString& Level)
+void UEditorPlusLevelLibrary::LoadLevel(const FString& Level)
 {
 	TArray<FString> Levels;
 	Levels.Add(Level);
@@ -324,7 +324,7 @@ void UEditorLevelLibrary2::LoadLevel(const FString& Level)
 	return LoadLevels(Levels);
 }
 
-void UEditorLevelLibrary2::LoadLevels(const TArray<FString>& Levels)
+void UEditorPlusLevelLibrary::LoadLevels(const TArray<FString>& Levels)
 {
 	auto LevelModels = ToLevelModelList(Levels);
 	if (LevelModels.Num() <= 0)
@@ -336,7 +336,7 @@ void UEditorLevelLibrary2::LoadLevels(const TArray<FString>& Levels)
 	});
 }
 
-void UEditorLevelLibrary2::UnloadLevels(const TArray<FString>& Levels)
+void UEditorPlusLevelLibrary::UnloadLevels(const TArray<FString>& Levels)
 {
 	auto LevelModels = ToLevelModelList(Levels);
 	if (LevelModels.Num() <= 0)
@@ -349,17 +349,17 @@ void UEditorLevelLibrary2::UnloadLevels(const TArray<FString>& Levels)
 	});
 }
 
-const TArray<FString> UEditorLevelLibrary2::GetAllLevels()
+const TArray<FString> UEditorPlusLevelLibrary::GetAllLevels()
 {
     return DoForWorldModel<const TArray<FString>>([](TSharedPtr<FLevelCollectionModel> WorldModel) { return FromLevelModelList(WorldModel->GetAllLevels()); });
 }
 
-const TArray<FString> UEditorLevelLibrary2::GetSelectedLevels()
+const TArray<FString> UEditorPlusLevelLibrary::GetSelectedLevels()
 {
     return DoForWorldModel<const TArray<FString>>([](TSharedPtr<FLevelCollectionModel> WorldModel) { return FromLevelModelList(WorldModel->GetSelectedLevels()); });
 }
 
-FIntVector UEditorLevelLibrary2::GetLevelLocation(const FString& Level)
+FIntVector UEditorPlusLevelLibrary::GetLevelLocation(const FString& Level)
 {
 	TArray<FString> Levels;
 	Levels.Add(Level);
@@ -378,7 +378,7 @@ FIntVector UEditorLevelLibrary2::GetLevelLocation(const FString& Level)
 	return FIntVector::ZeroValue;
 }
 
-void UEditorLevelLibrary2::SetLevelLocation(const FString& Level, const FIntVector& Location)
+void UEditorPlusLevelLibrary::SetLevelLocation(const FString& Level, const FIntVector& Location)
 {
 	TArray<FString> Levels;
 	Levels.Add(Level);
@@ -398,7 +398,7 @@ void UEditorLevelLibrary2::SetLevelLocation(const FString& Level, const FIntVect
 	}
 }
 
-void UEditorLevelLibrary2::DoForWorldModel(TFunction<void(TSharedPtr<FLevelCollectionModel>)> Func)
+void UEditorPlusLevelLibrary::DoForWorldModel(TFunction<void(TSharedPtr<FLevelCollectionModel>)> Func)
 {
 	auto World = GetEditorWorld();
 	check(World);
@@ -410,7 +410,7 @@ void UEditorLevelLibrary2::DoForWorldModel(TFunction<void(TSharedPtr<FLevelColle
 }
 
 template <typename T>
-T UEditorLevelLibrary2::DoForWorldModel(TFunction<T(TSharedPtr<FLevelCollectionModel>)> Func)
+T UEditorPlusLevelLibrary::DoForWorldModel(TFunction<T(TSharedPtr<FLevelCollectionModel>)> Func)
 {
     auto World = GetEditorWorld();
     check(World);
@@ -421,7 +421,7 @@ T UEditorLevelLibrary2::DoForWorldModel(TFunction<T(TSharedPtr<FLevelCollectionM
     return Func(WorldModel);
 }
 
-FLevelModelList UEditorLevelLibrary2::ToLevelModelList(const TArray<FString>& List)
+FLevelModelList UEditorPlusLevelLibrary::ToLevelModelList(const TArray<FString>& List)
 {
     FLevelModelList Result;
     if (List.Num() == 0)
@@ -440,7 +440,7 @@ FLevelModelList UEditorLevelLibrary2::ToLevelModelList(const TArray<FString>& Li
     return Result;
 }
 
-TArray<FString> UEditorLevelLibrary2::FromLevelModelList(const FLevelModelList& List)
+TArray<FString> UEditorPlusLevelLibrary::FromLevelModelList(const FLevelModelList& List)
 {
     TArray<FString> Result;
     if (List.Num() == 0)

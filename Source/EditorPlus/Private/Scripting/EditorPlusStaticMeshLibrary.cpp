@@ -1,10 +1,10 @@
-#include "Scripting/EditorStaticMeshLibrary2.h"
+#include "Scripting/EditorPlusStaticMeshLibrary.h"
 
 #include "Engine/StaticMesh.h"
 #include "Materials/MaterialInterface.h"
 #include "MeshDescription.h"
 
-TArray<FString> UEditorStaticMeshLibrary2::GetMaterialSlots(UStaticMesh* Object, bool bOnlyUnset)
+TArray<FString> UEditorPlusStaticMeshLibrary::GetMaterialSlots(UStaticMesh* Object, bool bOnlyUnset)
 {
     check(Object);
 
@@ -16,7 +16,7 @@ TArray<FString> UEditorStaticMeshLibrary2::GetMaterialSlots(UStaticMesh* Object,
     return Result;
 }
 
-void UEditorStaticMeshLibrary2::SetMaterialSlot_ByName(UStaticMesh* Object, const FString& Name, UMaterialInterface* Material)
+void UEditorPlusStaticMeshLibrary::SetMaterialSlot_ByName(UStaticMesh* Object, const FString& Name, UMaterialInterface* Material)
 {
     check(Object);
 
@@ -28,21 +28,25 @@ void UEditorStaticMeshLibrary2::SetMaterialSlot_ByName(UStaticMesh* Object, cons
     SetMaterialSlot_ByIndex(Object, Index, Material);
 }
 
-void UEditorStaticMeshLibrary2::SetMaterialSlot_ByIndex(UStaticMesh* Object, const int32 Index, UMaterialInterface* Material)
+void UEditorPlusStaticMeshLibrary::SetMaterialSlot_ByIndex(UStaticMesh* Object, const int32 Index, UMaterialInterface* Material)
 {
     check(Object);
 
     Object->SetMaterial(Index, Material);
 }
 
-void UEditorStaticMeshLibrary2::SetMeshBuildSettings(UStaticMesh* Object, bool bRecomputeTangents, bool bRecomputeNormals)
+void UEditorPlusStaticMeshLibrary::SetMeshBuildSettings(UStaticMesh* Object, bool bRecomputeTangents, bool bRecomputeNormals)
 {
     check(Object);
 
     auto NumLODs = Object->GetNumLODs();
     for (auto i = 0; i < NumLODs; i++)
     {
+#if ENGINE_MINOR_VERSION <= 22
         FStaticMeshSourceModel& SourceModel = Object->SourceModels[i];
+#else
+        FStaticMeshSourceModel& SourceModel = Object->GetSourceModel(i);
+#endif
         SourceModel.BuildSettings.bRecomputeNormals = bRecomputeNormals;
         SourceModel.BuildSettings.bRecomputeTangents = bRecomputeTangents;
     }
@@ -52,7 +56,7 @@ void UEditorStaticMeshLibrary2::SetMeshBuildSettings(UStaticMesh* Object, bool b
     Object->MarkPackageDirty();
 }
 
-void UEditorStaticMeshLibrary2::SetUVConstant(UStaticMesh* Object, const uint8& Channel, const FVector2D& UV)
+void UEditorPlusStaticMeshLibrary::SetUVConstant(UStaticMesh* Object, const uint8& Channel, const FVector2D& UV)
 {
     check(Object);
 

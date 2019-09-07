@@ -3,7 +3,7 @@
 #include "CoreUObject.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 
-#include "EditorObjectLibrary.generated.h"
+#include "EditorPlusObjectLibrary.generated.h"
 
 // FROM LevelCollectionModel.h
 //
@@ -35,22 +35,27 @@
 //};
 
 UCLASS()
-class EDITORPLUS_API UEditorObjectLibrary
+class EDITORPLUS_API UEditorPlusObjectLibrary
     : public UBlueprintFunctionLibrary
 {
     GENERATED_BODY()
 
 public:
-    UFUNCTION(BlueprintCallable, Category = "Editor Scripting | Object")
+    UFUNCTION(BlueprintCallable, Category = "Editor Plus | Object")
     static void AddToRoot(UObject* Object);
     
-    UFUNCTION(BlueprintCallable, Category = "Editor Scripting | Object")
+    UFUNCTION(BlueprintCallable, Category = "Editor Plus | Object")
     static void RemoveFromRoot(UObject* Object);
 
-    UFUNCTION(BlueprintCallable, Category = "Editor Plus | Object", meta = (DisplayName = "SetProperty"))
-    static bool SetProperty_Bool(UObject* Object, const FName& Name, bool Value) { return SetProperty(Object, Name, Value); }
+    UFUNCTION(BlueprintCallable, Category = "Editor Plus | Object", meta = (DisplayName = "Set Property (bool)"))
+    static bool SetProperty_Bool(UObject* Object, const FName Name, bool Value) { return SetProperty(Object, Name, Value); }
 
 private:
+    static void* GetPropertyValuePtr(UProperty* Property, UProperty* Outer, void* Data, int32 ArrayIndex);
+
     template <typename ValueType>
-    static bool SetProperty(UObject* Object, const FName& Name, ValueType Value);
+    static bool SetProperty(UObject* Object, const FName Name, const ValueType& Value);
+
+    template <typename PropertyType, typename ValueType>
+    static bool SetPropertyValue(UObject* Object, PropertyType* Property, int32 ArrayIndex, const ValueType& Value);
 };

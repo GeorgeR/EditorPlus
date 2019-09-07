@@ -1,4 +1,4 @@
-#include "Scripting/EditorAssetLibrary2.h"
+#include "Scripting/EditorPlusAssetLibrary.h"
 
 #include "Interfaces/Interface_AssetUserData.h"
 #include "ContentBrowserModule.h"
@@ -10,7 +10,7 @@
 
 #include "StringAssetUserData.h"
 
-UStringAssetUserData* UEditorAssetLibrary2::GetOrAddStringUserData(UObject* Object)
+UStringAssetUserData* UEditorPlusAssetLibrary::GetOrAddStringUserData(UObject* Object)
 {
     check(Object);
 
@@ -29,7 +29,7 @@ UStringAssetUserData* UEditorAssetLibrary2::GetOrAddStringUserData(UObject* Obje
     return nullptr;
 }
 
-TArray<UObject*> UEditorAssetLibrary2::GetSelected()
+TArray<UObject*> UEditorPlusAssetLibrary::GetSelected()
 {
 	auto& ContentBrowserModule = FModuleManager::LoadModuleChecked<FContentBrowserModule>(TEXT("ContentBrowser"));
 	TArray<FAssetData> SelectedAssets;
@@ -42,7 +42,7 @@ TArray<UObject*> UEditorAssetLibrary2::GetSelected()
 	return Result;
 }
 
-void UEditorAssetLibrary2::RenameAsset(UObject* Asset, const FString& NewName)
+void UEditorPlusAssetLibrary::RenameAsset(UObject* Asset, const FString& NewName)
 {
 	auto& AssetToolsModule = FModuleManager::LoadModuleChecked<FAssetToolsModule>(TEXT("AssetTools"));
 
@@ -57,7 +57,7 @@ void UEditorAssetLibrary2::RenameAsset(UObject* Asset, const FString& NewName)
 
 // NOTE: This doesn't seem to work
 // Returns number of assets affected
-TArray<FString> UEditorAssetLibrary2::GetWithCustomVersion(const FGuid VersionGuid, const int32 MinVersion, const int32 MaxVersion)
+TArray<FString> UEditorPlusAssetLibrary::GetWithCustomVersion(const FGuid VersionGuid, const int32 MinVersion, const int32 MaxVersion)
 {
 	TArray<FString> AffectedAssets;
 
@@ -118,7 +118,7 @@ TArray<FString> UEditorAssetLibrary2::GetWithCustomVersion(const FGuid VersionGu
 	return AffectedAssets;
 }
 
-int32 UEditorAssetLibrary2::ResaveWithCustomVersion(FGuid VersionGuid, int32 MinVersion, int32 MaxVersion)
+int32 UEditorPlusAssetLibrary::ResaveWithCustomVersion(FGuid VersionGuid, int32 MinVersion, int32 MaxVersion)
 {
 	//AssetToolsModule.Get().Vers
 
