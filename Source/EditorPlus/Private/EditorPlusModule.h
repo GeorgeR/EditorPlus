@@ -5,8 +5,13 @@
 #include "CoreMinimal.h"
 
 class FEditorPlusDetailCustomizations;
+class FEditorPlusToolbarExtender;
 
-class FEditorPlusModule 
+class FToolBarBuilder;
+class FMenuBuilder;
+class FUICommandList;
+
+class FEditorPlusModule
     : public IEditorPlusModule
 {
 public:
@@ -19,4 +24,5 @@ public:
 
 private:
     TUniquePtr<FEditorPlusDetailCustomizations> DetailCustomizations;
+	TUniquePtr<FEditorPlusToolbarExtender> ToolbarExtender;
 };

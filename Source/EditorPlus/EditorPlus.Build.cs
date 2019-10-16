@@ -34,29 +34,36 @@ public class EditorPlus : ModuleRules
 			new string[]
 			{
 			    "AssetRegistry",
-                "Core",				
+                "Core",
 				"CoreUObject",
 				"Engine",
                 "Landscape",
 			    "LandscapeEditor"
 			});
-		
+
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
+                "AssetTools",
+                "Core",
+                "CoreUObject",
 				"EditorStyle",
+                "EditorSubsystem",
+                "Engine",
                 "Foliage",
 				"GraphEditor",
 				"InputCore",
 				"Json",
                 "JsonUtilities",
+                "LevelEditor",
                 "MaterialEditor",
                 "MaterialUtilities",
                 "MeshDescription",
+                "Projects",
 				"PropertyEditor",
                 "RawMesh",
 				"Slate",
-				"SlateCore",				
+				"SlateCore",
 				"UnrealEd",
                 "WorldBrowser"
 			});

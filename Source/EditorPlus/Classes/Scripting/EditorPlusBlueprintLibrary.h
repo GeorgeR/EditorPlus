@@ -16,10 +16,10 @@ class EDITORPLUS_API UEditorPlusBlueprintLibrary
 
 public:
     /** From user PhilippOkoampah: https://answers.unrealengine.com/questions/558236/how-to-get-a-component-from-a-classdefaultobject.html */
-    UFUNCTION(BlueprintCallable, Category = "Editor Plus | Blueprint")
+    UFUNCTION(BlueprintCallable, Category = "EditorPlus|Blueprint")
     static UActorComponent* FindDefaultComponentByClass(UObject* Blueprint, const TSubclassOf<UActorComponent> ComponentClass);
 
     /** https://answers.unrealengine.com/questions/558236/how-to-get-a-component-from-a-classdefaultobject.html */
-    UFUNCTION(BlueprintCallable, Category = "Editor Plus | Blueprint")
+    UFUNCTION(BlueprintCallable, Category = "EditorPlus|Blueprint")
     static TArray<UActorComponent*> FindDefaultComponentsByClass(UObject* Blueprint, const TSubclassOf<UActorComponent> ComponentClass);
 };

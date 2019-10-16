@@ -15,19 +15,19 @@ class EDITORPLUS_API UEditorPlusLandscapeLibrary
     GENERATED_BODY()
 
 public:
-    UFUNCTION(BlueprintCallable, Category = "Editor Plus | Landscape")
+    UFUNCTION(BlueprintCallable, Category = "EditorPlus|Landscape")
     static void ImportHeightmap(ALandscapeProxy* Landscape, const FString& FilePath = TEXT(""));
 
-	UFUNCTION(BlueprintCallable, Category = "Editor Plus | Landscape")
+	UFUNCTION(BlueprintCallable, Category = "EditorPlus|Landscape")
 	static void ImportWeightmap(ALandscapeProxy* Landscape, const FString& LayerName, const FString& FilePath = TEXT(""));
 
-	UFUNCTION(BlueprintCallable, Category = "Editor Plus | Landscape")
+	UFUNCTION(BlueprintCallable, Category = "EditorPlus|Landscape")
 	static void ReimportMaps(ALandscapeProxy* Landscape);
 
-    UFUNCTION(BlueprintCallable, Category = "Editor Plus | Landscape")
+    UFUNCTION(BlueprintCallable, Category = "EditorPlus|Landscape")
     static ALandscape* ResizeLandscape(ALandscapeProxy* Landscape, const int32 ComponentCount, const int32 SectionsPerComponent, const int32 QuadsPerSection);
 
-	UFUNCTION(BlueprintCallable, Category = "Editor Plus | Landscape")
+	UFUNCTION(BlueprintCallable, Category = "EditorPlus|Landscape")
 	static void SetLocationZ(ALandscapeProxy* Landscape, const float LocationZ);
 
 private:

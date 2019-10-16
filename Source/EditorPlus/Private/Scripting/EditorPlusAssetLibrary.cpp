@@ -7,17 +7,101 @@
 #include "AssetData.h"
 #include "AssetToolsModule.h"
 #include "AssetRegistryModule.h"
+#include "FileHelpers.h"
+#include "IAssetTools.h"
+#include "PackageTools.h"
 
 #include "StringAssetUserData.h"
+
+bool UEditorPlusAssetLibrary::SplitObjectPath_Object(
+	UObject* Object, 
+	FString& OutPath, 
+	FString& OutName, 
+	FString& OutClassName, 
+	FString& OutExtension)
+{
+	check(Object);
+
+	if(!Object->IsAsset())
+		return false;
+	
+	return SplitObjectPath_ObjectPath(Object->GetPathName(), OutPath, OutName, OutClassName, OutExtension);
+}
+
+bool UEditorPlusAssetLibrary::SplitObjectPath_Name(
+	const FName& Path, 
+	FString& OutPath, 
+	FString& OutName, 
+	FString& OutClassName, 
+	FString& OutExtension)
+{
+	return SplitObjectPath_ObjectPath(Path.ToString(), OutPath, OutName, OutClassName, OutExtension);
+}
+
+bool UEditorPlusAssetLibrary::SplitObjectPath_AssetData(
+	const FAssetData& AssetData, 
+	FString& OutPath, 
+	FString& OutName, 
+	FString& OutClassName, 
+	FString& OutExtension)
+{
+	check(AssetData.IsValid());
+	
+	return SplitObjectPath_ObjectPath(AssetData.ToSoftObjectPath(), OutPath, OutName, OutClassName, OutExtension);
+}
+
+bool UEditorPlusAssetLibrary::SplitObjectPath_ObjectPath(
+	const FSoftObjectPath& ObjectPath, 
+	FString& OutPath, 
+	FString& OutName, 
+	FString& OutClassName, 
+	FString& OutExtension)
+{
+	check(ObjectPath.IsValid());
+
+	const auto PathName = ObjectPath.GetAssetPathString();
+	return SplitObjectPath_String(PathName, OutPath, OutName, OutClassName, OutExtension);
+}
+
+bool UEditorPlusAssetLibrary::SplitObjectPath_String(
+	const FString& Path, 
+	FString& OutPath, 
+	FString& OutName, 
+	FString& OutClassName, 
+	FString& OutExtension)
+{
+	FString LongPath;
+	if(FPackageName::TryConvertShortPackagePathToLongInObjectPath(Path, LongPath))
+	{
+		
+	}
+	
+	FPaths::Split(Path, OutPath, OutName, OutExtension);
+
+	return true;
+	//return SplitObjectPath_ObjectPath(AssetData.ToSoftObjectPath(), OutPath, OutName, OutClassName, OutExtension);
+}
+
+UObject* UEditorPlusAssetLibrary::GetOrCreateAsset(const FString& Path, const FString& Name, TSubclassOf<UObject> Class)
+{
+	auto& AssetRegistry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry")).Get();
+	const auto ObjectPath = FName(*(Path + TEXT("/") + Name));
+	const auto Asset = AssetRegistry.GetAssetByObjectPath(ObjectPath);
+	if(Asset.IsValid())
+		return Asset.GetAsset();
+
+	auto& AssetTools = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools").Get();
+	return AssetTools.CreateAsset(Name, Path, Class, nullptr);
+}
 
 UStringAssetUserData* UEditorPlusAssetLibrary::GetOrAddStringUserData(UObject* Object)
 {
     check(Object);
 
-    if (IInterface_AssetUserData* AssetUserData = Cast<IInterface_AssetUserData>(Object))
+    if (auto AssetUserData = Cast<IInterface_AssetUserData>(Object))
     {
         auto Result = Cast<UStringAssetUserData>(AssetUserData->GetAssetUserDataOfClass(UStringAssetUserData::StaticClass()));
-        if (Result == nullptr)
+        if (!Result)
         {
             Result = NewObject<UStringAssetUserData>();
             AssetUserData->AddAssetUserData(Result);
@@ -47,10 +131,57 @@ void UEditorPlusAssetLibrary::RenameAsset(UObject* Asset, const FString& NewName
 	auto& AssetToolsModule = FModuleManager::LoadModuleChecked<FAssetToolsModule>(TEXT("AssetTools"));
 
 	TArray<FAssetRenameData> AssetsAndNames;
-	const FString PackagePath = FPackageName::GetLongPackagePath(Asset->GetOutermost()->GetName());
-	new (AssetsAndNames) FAssetRenameData(Asset, PackagePath, NewName);
-
+	const auto PackagePath = FPackageName::GetLongPackagePath(Asset->GetOutermost()->GetName());
+	AssetsAndNames.Add(FAssetRenameData(Asset, PackagePath, NewName));
+	
 	AssetToolsModule.Get().RenameAssetsWithDialog(AssetsAndNames);
+}
+
+TArray<FString> UEditorPlusAssetLibrary::GetAllPackageFiles()
+{
+	TArray<FString> Result;
+	
+	TArray<FString> AllPackageFileNames;
+	FEditorFileUtils::FindAllPackageFiles(AllPackageFileNames);
+	for(auto PackageIdx = 0; PackageIdx < AllPackageFileNames.Num(); PackageIdx++)
+	{
+		const auto& FileName = AllPackageFileNames[PackageIdx];
+		FString LongPackageName;
+		if(FPackageName::TryConvertFilenameToLongPackageName(FileName, LongPackageName))
+		{
+			Result.Add(LongPackageName);
+		}
+	}
+
+	return Result;
+}
+
+TArray<FString> UEditorPlusAssetLibrary::GetAllAssetFiles()
+{
+	TArray<FString> Result;
+	
+	auto AllPackageFileNames = GetAllPackageFiles();
+	for(auto& FileName : AllPackageFileNames)
+	{
+		if(FPaths::GetExtension(FileName, true) == FPackageName::GetAssetPackageExtension())
+			Result.Add(FileName);
+	}
+
+	return Result;
+}
+
+TArray<FString> UEditorPlusAssetLibrary::GetAllMapFiles()
+{
+		TArray<FString> Result;
+	
+	auto AllPackageFileNames = GetAllPackageFiles();
+	for(auto& FileName : AllPackageFileNames)
+	{
+		if(FPaths::GetExtension(FileName, true) == FPackageName::GetMapPackageExtension())
+			Result.Add(FileName);
+	}
+
+	return Result;
 }
 
 #pragma region Not Working

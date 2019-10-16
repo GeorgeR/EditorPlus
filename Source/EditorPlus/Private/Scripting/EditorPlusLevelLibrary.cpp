@@ -11,22 +11,90 @@
 #include "Engine/LevelStreamingDynamic.h"
 //#include "EditorObjectLibrary.h"
 #include "WorldBrowserModule.h"
+#include "HierarchicalLOD.h"
+#include "EngineUtils.h"
+#include "Engine/LODActor.h"
+
+#include "EditorPlusInternalUtilties.h"
 
 #include "Private/LevelCollectionModel.h"
 #include "Private/LevelModel.h"
 #include "Private/Tiles/WorldTileModel.h"
 #include "Private/Tiles/WorldTileDetails.h"
 
-UWorld* GetEditorWorld()
+#define LOCTEXT_NAMESPACE "EditorPlus"
+
+void UEditorPlusLevelLibrary::BuildHLOD(bool bForceRebuild)
 {
-    return GEditor ? GEditor->GetEditorWorldContext(false).World() : nullptr;
+	const auto World = FEditorPlusInternalUtilities::GetEditorWorldChecked();
+
+	auto HLODBuilder = World->HierarchicalLODBuilder;
+	if(HLODBuilder->NeedsBuild(true) || bForceRebuild)
+	{
+		DeselectAllActorsOfClass(ALODActor::StaticClass());
+		
+		HLODBuilder->Build();
+		HLODBuilder->BuildMeshesForLODActors(bForceRebuild);
+	}
+}
+
+void UEditorPlusLevelLibrary::BuildHLODClusters(const bool bRebuild)
+{
+	const auto World = FEditorPlusInternalUtilities::GetEditorWorldChecked();
+	auto HLODBuilder = World->HierarchicalLODBuilder;
+
+	TArray<ALODActor*> ActorsToBuild;
+	for(TActorIterator<ALODActor> ActorIterator(World); ActorIterator; ++ActorIterator)
+	{
+		const auto LODActor = *ActorIterator;
+		if(!LODActor->IsBuilt(bRebuild))
+			ActorsToBuild.Add(LODActor);
+	}
+
+	FScopedSlowTask SlowTask(ActorsToBuild.Num(), FText::Format( LOCTEXT("EditorPlus.BuildClusters", "Building Cluster {0}|plural(one=Mesh,other=Meshes)"), ActorsToBuild.Num()));
+	SlowTask.MakeDialog();
+	{
+		for(auto& LODActor : ActorsToBuild)
+		{
+			//GEditor->MoveViewportCamerasToActor(*LODActor, false);
+			auto Bounds = LODActor->GetComponentsBoundingBox(true);
+			GEditor->MoveViewportCamerasToBox(Bounds, false);
+			GEditor->RedrawLevelEditingViewports();
+			
+			HLODBuilder->BuildMeshForLODActor(LODActor, LODActor->LODLevel - 1);
+			
+			SlowTask.EnterProgressFrame();
+		}
+	}
+}
+
+bool UEditorPlusLevelLibrary::IsHLODBuilt()
+{
+	const auto World = FEditorPlusInternalUtilities::GetEditorWorldChecked();
+
+	const auto HLODBuilder = World->HierarchicalLODBuilder;
+	return HLODBuilder->NeedsBuild(true);
+}
+
+bool UEditorPlusLevelLibrary::DeselectAllActorsOfClass(const TSubclassOf<AActor> ActorClass)
+{
+	auto bSomethingWasDeselected = false;
+	
+	const auto World = FEditorPlusInternalUtilities::GetEditorWorldChecked();
+	for(TActorIterator<AActor> ActorIterator(World, ActorClass); ActorIterator; ++ActorIterator)
+	{
+		const auto Actor = *ActorIterator;
+		GEditor->SelectActor(Actor, false, false, true);
+		bSomethingWasDeselected = true;
+	}
+
+	return bSomethingWasDeselected;
 }
 
 /* Return true if it exists, false if it didn't and was created */
 bool UEditorPlusLevelLibrary::GetOrCreateFolder(FName Path)
 {
-    auto World = GetEditorWorld();
-    check(World);
+	const auto World = FEditorPlusInternalUtilities::GetEditorWorldChecked();
 
     auto& ActorFolders = FActorFolders::Get();
     /*auto& Folders = ActorFolders.GetOrCreateFoldersForWorld(World);
@@ -42,29 +110,27 @@ bool UEditorPlusLevelLibrary::GetOrCreateFolder(FName Path)
     return true;
 }
 
-bool UEditorPlusLevelLibrary::MoveActorsToFolder(TArray<AActor*> Actors, FName Path)
+bool UEditorPlusLevelLibrary::MoveActorsToFolder(TArray<AActor*> Actors, const FName Path)
 {
     GetOrCreateFolder(Path);
 
-    auto World = GetEditorWorld();
+    const auto World = FEditorPlusInternalUtilities::GetEditorWorld();
     for (auto Actor : Actors)
         Actor->SetFolderPath_Recursively(Path);
-    
+
     return true;
 }
 
 FString UEditorPlusLevelLibrary::CurrentLevelName()
 {
-	auto World = GetEditorWorld();
-	check(World);
+	const auto World = FEditorPlusInternalUtilities::GetEditorWorldChecked();
 
 	return World->GetName();
 }
 
 FString UEditorPlusLevelLibrary::GetCurrentLevelPath()
 {
-    auto World = GetEditorWorld();
-    check(World);
+    const auto World = FEditorPlusInternalUtilities::GetEditorWorldChecked();
 
     FString Result = TEXT("World'");
     Result = Result.Append(World->GetFullName(nullptr).RightChop(6));
@@ -74,15 +140,14 @@ FString UEditorPlusLevelLibrary::GetCurrentLevelPath()
 
 void UEditorPlusLevelLibrary::SetWorldOrigin(const int32& X, const int32& Y, const int32& Z)
 {
-    auto World = GetEditorWorld();
-    check(World);
+    const auto World = FEditorPlusInternalUtilities::GetEditorWorldChecked();
 
     World->SetNewWorldOrigin(FIntVector(X, Y, Z));
 }
 
 void UEditorPlusLevelLibrary::AddStreamingLevel(const FName& Path)
 {
-	auto World = GetEditorWorld();
+	const auto World = FEditorPlusInternalUtilities::GetEditorWorldChecked();
 	UEditorLevelUtils::AddLevelToWorld(World, *Path.ToString(), ULevelStreamingAlwaysLoaded::StaticClass());
 }
 
@@ -95,8 +160,7 @@ TArray<AActor*> UEditorPlusLevelLibrary::GetActorsInSublevel(const FName& Sublev
 
 TArray<FString> UEditorPlusLevelLibrary::GetSubLevels()
 {
-	auto World = GetEditorWorld();
-	check(World);
+	const auto World = FEditorPlusInternalUtilities::GetEditorWorldChecked();
 
 	TArray<FString> Result;
 	if (World->GetWorldSettings()->bEnableWorldComposition)
@@ -116,14 +180,13 @@ TArray<FString> UEditorPlusLevelLibrary::GetSubLevels()
 // Based on LevelCollectionModel::LoadLevels
 TArray<ULevel*> UEditorPlusLevelLibrary::LoadSubLevels(const TArray<FString>& Paths)
 {
-	auto World = GetEditorWorld();
-	check(World);
+	const auto World = FEditorPlusInternalUtilities::GetEditorWorldChecked();
 
-	FText TaskLabel = FText::FromString(TEXT("Loading Levels"));
+	auto TaskLabel = FText::FromString(TEXT("Loading Levels"));
 	GWarn->BeginSlowTask(TaskLabel, true);
 
 	TArray<ULevel*> Levels;
-	int LevelIndex = 0;
+	auto LevelIndex = 0;
 	for (auto& Path : Paths)
 	{
 		TaskLabel = FText::FromString(FString::Printf(TEXT("Loading: %s..."), *Path));
@@ -132,7 +195,7 @@ TArray<ULevel*> UEditorPlusLevelLibrary::LoadSubLevels(const TArray<FString>& Pa
 		auto Level = LoadSubLevel(Path);
 		Levels.Add(Level);
 	}
-	
+
 	GWarn->EndSlowTask();
 
 	return Levels;
@@ -140,24 +203,23 @@ TArray<ULevel*> UEditorPlusLevelLibrary::LoadSubLevels(const TArray<FString>& Pa
 
 ULevel* UEditorPlusLevelLibrary::LoadSubLevel(const FString& Path)
 {
-	auto World = GetEditorWorld();
-	check(World);
+	const auto World = FEditorPlusInternalUtilities::GetEditorWorldChecked();
 
-	FName PackageName = FName(*Path);
+	auto PackageName = FName(*Path);
 
 	/* Get Streaming Level */
 	ULevelStreaming* AssociatedStreamingLevel = nullptr;
 	{
 		// Try to find existing object first
-		auto Predicate = [&](ULevelStreaming* StreamingLevel)
+		const auto FindStreamingLevel = [&](ULevelStreaming* StreamingLevel)
 		{
 			return (StreamingLevel && StreamingLevel->GetWorldAssetPackageFName() == PackageName && StreamingLevel->HasAnyFlags(RF_Transient));
 		};
 
-		if (ULevelStreaming*const* FoundStreamingLevel = World->GetStreamingLevels().FindByPredicate(Predicate))
+		if (const auto FoundStreamingLevel = World->GetStreamingLevels().FindByPredicate(FindStreamingLevel))
 			AssociatedStreamingLevel = *FoundStreamingLevel;
 
-		if (AssociatedStreamingLevel == nullptr)
+		if (!AssociatedStreamingLevel)
 		{
 			// Create new streaming level
 			AssociatedStreamingLevel = NewObject<ULevelStreamingDynamic>(World, NAME_None, RF_Transient);
@@ -173,25 +235,26 @@ ULevel* UEditorPlusLevelLibrary::LoadSubLevel(const FString& Path)
 	check(AssociatedStreamingLevel);
 
 	// Check if already loaded
-	if (AssociatedStreamingLevel->GetLoadedLevel() != nullptr)
+	if (AssociatedStreamingLevel->GetLoadedLevel())
 		return AssociatedStreamingLevel->GetLoadedLevel();
 
 	// Load level package 
 	{
-		FName LevelPackageName = AssociatedStreamingLevel->GetWorldAssetPackageFName();
+		const auto LevelPackageName = AssociatedStreamingLevel->GetWorldAssetPackageFName();
 
 		ULevel::StreamedLevelsOwningWorld.Add(LevelPackageName, World);
 		UWorld::WorldTypePreLoadMap.FindOrAdd(LevelPackageName) = World->WorldType;
 
-		UPackage* LevelPackage = LoadPackage(nullptr, *LevelPackageName.ToString(), LOAD_None);
+		const auto LevelPackage = LoadPackage(nullptr, *LevelPackageName.ToString(), LOAD_None);
 
 		ULevel::StreamedLevelsOwningWorld.Remove(LevelPackageName);
 		UWorld::WorldTypePreLoadMap.Remove(LevelPackageName);
 
 		// Find world object and use its PersistentLevel pointer.
-		UWorld* LevelWorld = UWorld::FindWorldInPackage(LevelPackage);
+		auto LevelWorld = UWorld::FindWorldInPackage(LevelPackage);
+		
 		// Check for a redirector. Follow it, if found.
-		if (LevelWorld == nullptr)
+		if (!LevelWorld)
 			LevelWorld = UWorld::FollowWorldRedirectorInPackage(LevelPackage);
 
 		if (LevelWorld && LevelWorld->PersistentLevel)
@@ -207,7 +270,7 @@ ULevel* UEditorPlusLevelLibrary::LoadSubLevel(const FString& Path)
 	AssociatedStreamingLevel->SetShouldBeVisibleInEditor(false);
 	World->FlushLevelStreaming();
 
-	auto LoadedLevel = AssociatedStreamingLevel->GetLoadedLevel();
+	const auto LoadedLevel = AssociatedStreamingLevel->GetLoadedLevel();
 
 	FUnmodifiableObject ImmuneLevel(LoadedLevel);
 	EditorLevelUtils::SetLevelVisibility(LoadedLevel, true, true);
@@ -215,11 +278,94 @@ ULevel* UEditorPlusLevelLibrary::LoadSubLevel(const FString& Path)
 	return LoadedLevel;
 }
 
+void UEditorPlusLevelLibrary::LoadSubLevelAsync(const FString& Path)
+{
+	const auto World = FEditorPlusInternalUtilities::GetEditorWorldChecked();
+
+	auto PackageName = FName(*Path);
+
+	/* Get Streaming Level */
+	ULevelStreaming* AssociatedStreamingLevel = nullptr;
+	{
+		// Try to find existing object first
+		const auto FindStreamingLevel = [&](ULevelStreaming* StreamingLevel)
+		{
+			return (StreamingLevel && StreamingLevel->GetWorldAssetPackageFName() == PackageName && StreamingLevel->HasAnyFlags(RF_Transient));
+		};
+
+		if (const auto FoundStreamingLevel = World->GetStreamingLevels().FindByPredicate(FindStreamingLevel))
+			AssociatedStreamingLevel = *FoundStreamingLevel;
+
+		if (!AssociatedStreamingLevel)
+		{
+			// Create new streaming level
+			AssociatedStreamingLevel = NewObject<ULevelStreamingDynamic>(World, NAME_None, RF_Transient);
+
+			AssociatedStreamingLevel->SetWorldAssetByPackageName(PackageName);
+			AssociatedStreamingLevel->LevelTransform = FTransform::Identity;
+			AssociatedStreamingLevel->PackageNameToLoad = PackageName;
+
+			World->AddStreamingLevel(AssociatedStreamingLevel);
+		}
+	}
+
+	check(AssociatedStreamingLevel);
+
+	// Check if already loaded
+	if (AssociatedStreamingLevel->GetLoadedLevel())
+		return;
+
+	// Load level package 
+	{
+		const auto LevelPackageName = AssociatedStreamingLevel->GetWorldAssetPackageFName();
+
+		ULevel::StreamedLevelsOwningWorld.Add(LevelPackageName, World);
+		UWorld::WorldTypePreLoadMap.FindOrAdd(LevelPackageName) = World->WorldType;
+
+		//const auto LevelPackage = LoadPackage(nullptr, *LevelPackageName.ToString(), LOAD_None);
+		auto OnLoaded = [&, World, LevelPackageName, AssociatedStreamingLevel](const FName& _PackageName, UPackage* LoadedPackage, EAsyncLoadingResult::Type _Result)
+		{
+			check(IsInGameThread());
+			if(!AssociatedStreamingLevel || !AssociatedStreamingLevel->IsValidLowLevel())
+				return;
+			
+			ULevel::StreamedLevelsOwningWorld.Remove(LevelPackageName);
+			UWorld::WorldTypePreLoadMap.Remove(LevelPackageName);
+
+			// Find world object and use its PersistentLevel pointer.
+			auto LevelWorld = UWorld::FindWorldInPackage(LoadedPackage);
+			
+			// Check for a redirector. Follow it, if found.
+			if (!LevelWorld)
+				LevelWorld = UWorld::FollowWorldRedirectorInPackage(LoadedPackage);
+
+			if (LevelWorld && LevelWorld->PersistentLevel)
+			{
+				// LevelStreaming is transient object so world composition stores color in ULevel object
+				AssociatedStreamingLevel->LevelColor = LevelWorld->PersistentLevel->LevelColor;
+			}
+
+			// Our level package should be loaded at this point, so level streaming will find it in memory
+			AssociatedStreamingLevel->SetShouldBeLoaded(true);
+			AssociatedStreamingLevel->SetShouldBeVisible(false); // Should be always false in the Editor
+			AssociatedStreamingLevel->SetShouldBeVisibleInEditor(false);
+			World->FlushLevelStreaming();
+
+			const auto LoadedLevel = AssociatedStreamingLevel->GetLoadedLevel();
+
+			FUnmodifiableObject ImmuneLevel(LoadedLevel);
+			EditorLevelUtils::SetLevelVisibility(LoadedLevel, true, true);
+		};
+		
+		LoadPackageAsync(LevelPackageName.ToString(), FLoadPackageAsyncDelegate::CreateLambda(OnLoaded));
+		//const auto LevelPackage = LoadPackageAsync()
+	}
+}
+
 // Based on LevelCollectionModel::UnloadLevels
 void UEditorPlusLevelLibrary::UnloadSubLevels(const TArray<ULevel*>& Levels, bool bSaveIfDirty)
 {
-	auto World = GetEditorWorld();
-	check(World);
+	const auto World = FEditorPlusInternalUtilities::GetEditorWorldChecked();
 
 	if (Levels.Num() == 0)
 		return;
@@ -268,14 +414,13 @@ void UEditorPlusLevelLibrary::UnloadSubLevels(const TArray<ULevel*>& Levels, boo
 	}
 
 	GWarn->EndSlowTask();
-	
+
 	CollectGarbage(GARBAGE_COLLECTION_KEEPFLAGS);
 }
 
 TArray<FIntPoint> UEditorPlusLevelLibrary::GetSubLevelPositions(const TArray<ULevel*>& Levels)
 {
-	auto World = GetEditorWorld();
-	check(World);
+	const auto World = FEditorPlusInternalUtilities::GetEditorWorldChecked();
 
 	TArray<FIntPoint> Result;
 	return Result;
@@ -283,8 +428,7 @@ TArray<FIntPoint> UEditorPlusLevelLibrary::GetSubLevelPositions(const TArray<ULe
 
 FIntPoint UEditorPlusLevelLibrary::GetSubLevelPosition(ULevel* Level)
 {
-	auto World = GetEditorWorld();
-	check(World);
+	const auto World = FEditorPlusInternalUtilities::GetEditorWorldChecked();
 
 	// if bounds is valid
 	// local position from bounds center
@@ -296,14 +440,12 @@ FIntPoint UEditorPlusLevelLibrary::GetSubLevelPosition(ULevel* Level)
 
 void UEditorPlusLevelLibrary::SetSubLevelPositions(const TArray<ULevel*>& Levels, const FIntPoint& Position)
 {
-	auto World = GetEditorWorld();
-	check(World);
+	const auto World = FEditorPlusInternalUtilities::GetEditorWorldChecked();
 }
 
 void UEditorPlusLevelLibrary::SetSubLevelPosition(ULevel* Levels, const FIntPoint& Position)
 {
-	auto World = GetEditorWorld();
-	check(World);
+	const auto World = FEditorPlusInternalUtilities::GetEditorWorldChecked();
 }
 
 void UEditorPlusLevelLibrary::Test()
@@ -368,7 +510,7 @@ FIntVector UEditorPlusLevelLibrary::GetLevelLocation(const FString& Level)
 	if (LevelModels.Num() <= 0)
 		return FIntVector::ZeroValue;
 
-	auto TileModel = StaticCastSharedPtr<FWorldTileModel>(LevelModels[0]);
+	const auto TileModel = StaticCastSharedPtr<FWorldTileModel>(LevelModels[0]);
 	if (TileModel.IsValid())
 	{
 		if (TileModel->TileDetails != nullptr)
@@ -394,17 +536,22 @@ void UEditorPlusLevelLibrary::SetLevelLocation(const FString& Level, const FIntV
 		{
 			TileModel->TileDetails->Position = Location;
 			TileModel->TileDetails->PositionChangedEvent.Broadcast();
-		}	
+		}
 	}
+}
+
+bool UEditorPlusLevelLibrary::IsThreadProcessingTasks()
+{
+	const auto bIsProcessingTasks = FTaskGraphInterface::Get().IsThreadProcessingTasks(ENamedThreads::GetRenderThread_Local());
+	return bIsProcessingTasks;
 }
 
 void UEditorPlusLevelLibrary::DoForWorldModel(TFunction<void(TSharedPtr<FLevelCollectionModel>)> Func)
 {
-	auto World = GetEditorWorld();
-	check(World);
+	const auto World = FEditorPlusInternalUtilities::GetEditorWorldChecked();
 
-	FWorldBrowserModule& WorldBrowserModule = FModuleManager::LoadModuleChecked<FWorldBrowserModule>(TEXT("WorldBrowser"));
-	auto WorldModel = WorldBrowserModule.SharedWorldModel(World);
+	auto& WorldBrowserModule = FModuleManager::LoadModuleChecked<FWorldBrowserModule>(TEXT("WorldBrowser"));
+	const auto WorldModel = WorldBrowserModule.SharedWorldModel(World);
 	ensure(WorldModel.IsValid());
 	Func(WorldModel);
 }
@@ -412,10 +559,9 @@ void UEditorPlusLevelLibrary::DoForWorldModel(TFunction<void(TSharedPtr<FLevelCo
 template <typename T>
 T UEditorPlusLevelLibrary::DoForWorldModel(TFunction<T(TSharedPtr<FLevelCollectionModel>)> Func)
 {
-    auto World = GetEditorWorld();
-    check(World);
+    const auto World = FEditorPlusInternalUtilities::GetEditorWorldChecked();
 
-    FWorldBrowserModule& WorldBrowserModule = FModuleManager::LoadModuleChecked<FWorldBrowserModule>(TEXT("WorldBrowser"));
+    auto& WorldBrowserModule = FModuleManager::LoadModuleChecked<FWorldBrowserModule>(TEXT("WorldBrowser"));
     auto WorldModel = WorldBrowserModule.SharedWorldModel(World);
     ensure(WorldModel.IsValid());
     return Func(WorldModel);
@@ -430,10 +576,10 @@ FLevelModelList UEditorPlusLevelLibrary::ToLevelModelList(const TArray<FString>&
     auto AllLevels = DoForWorldModel<const FLevelModelList>([](TSharedPtr<FLevelCollectionModel> WorldModel) { return WorldModel->GetAllLevels(); });
     for (auto& Item : List)
     {
-        auto Level = AllLevels.FindByPredicate([&](TSharedPtr<FLevelModel> LevelModel) {
+	    const auto Level = AllLevels.FindByPredicate([&](TSharedPtr<FLevelModel> LevelModel) {
             return LevelModel->GetPackageFileName().Equals(Item);
         });
-        
+
         if (Level != nullptr)
             Result.Add(*Level);
     }
@@ -451,3 +597,5 @@ TArray<FString> UEditorPlusLevelLibrary::FromLevelModelList(const FLevelModelLis
 
     return Result;
 }
+
+#undef LOCTEXT_NAMESPACE

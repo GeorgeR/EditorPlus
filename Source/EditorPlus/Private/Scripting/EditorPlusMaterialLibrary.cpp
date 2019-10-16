@@ -13,7 +13,7 @@
 
 UMaterialInterface* UEditorPlusMaterialLibrary::CreateMaterialInstance_FromPath(const FString& BaseMaterialPath, const FString& DestinationPath)
 {
-    auto BaseMaterial = LoadObject<UMaterialInterface>(nullptr, *BaseMaterialPath);
+	const auto BaseMaterial = LoadObject<UMaterialInterface>(nullptr, *BaseMaterialPath);
     return CreateMaterialInstance(BaseMaterial, DestinationPath);
 }
 
@@ -27,8 +27,8 @@ UMaterialInterface* UEditorPlusMaterialLibrary::CreateMaterialInstance(UMaterial
     //    ObjectTools::ForceDeleteObjects(ExistingObject, false);
     //}
 
-    const FString AssetBaseName = FPackageName::GetShortName(DestinationPath);
-    const FString AssetBasePath = FPackageName::GetLongPackagePath(DestinationPath) + TEXT("/");
+    const auto AssetBaseName = FPackageName::GetShortName(DestinationPath);
+    const auto AssetBasePath = FPackageName::GetLongPackagePath(DestinationPath) + TEXT("/");
 
     auto MaterialOuter = CreatePackage(nullptr, *(AssetBasePath + AssetBaseName));
     MaterialOuter->FullyLoad();
@@ -44,7 +44,7 @@ UMaterialInterface* UEditorPlusMaterialLibrary::CreateMaterialInstance(UMaterial
         CollectGarbage(GARBAGE_COLLECTION_KEEPFLAGS, true);
     }
 
-    UMaterialInstanceConstant* MaterialInstance = NewObject<UMaterialInstanceConstant>(MaterialOuter, FName(*AssetBaseName), EObjectFlags::RF_Public | EObjectFlags::RF_Standalone);
+    const auto MaterialInstance = NewObject<UMaterialInstanceConstant>(MaterialOuter, FName(*AssetBaseName), EObjectFlags::RF_Public | EObjectFlags::RF_Standalone);
     MaterialInstance->Parent = BaseMaterial;
 
     return MaterialInstance;
@@ -54,10 +54,10 @@ bool UEditorPlusMaterialLibrary::SetVectorParameter(UMaterialInterface* Material
 {
     check(Material);
 
-    auto MaterialInstance = Cast<UMaterialInstance>(Material);
+    const auto MaterialInstance = Cast<UMaterialInstance>(Material);
     if (MaterialInstance != nullptr)
     {
-        auto MaterialInstanceConstant = Cast<UMaterialInstanceConstant>(MaterialInstance);
+	    const auto MaterialInstanceConstant = Cast<UMaterialInstanceConstant>(MaterialInstance);
         if (MaterialInstanceConstant != nullptr)
         {
             return UMaterialEditingLibrary::SetMaterialInstanceVectorParameterValue(MaterialInstanceConstant, Name, Value);
@@ -76,10 +76,10 @@ bool UEditorPlusMaterialLibrary::SetScalarParameter(UMaterialInterface* Material
 {
     check(Material);
 
-    auto MaterialInstance = Cast<UMaterialInstance>(Material);
+    const auto MaterialInstance = Cast<UMaterialInstance>(Material);
     if (MaterialInstance != nullptr)
     {
-        auto MaterialInstanceConstant = Cast<UMaterialInstanceConstant>(MaterialInstance);
+	    const auto MaterialInstanceConstant = Cast<UMaterialInstanceConstant>(MaterialInstance);
         if (MaterialInstanceConstant != nullptr)
         {
             return UMaterialEditingLibrary::SetMaterialInstanceScalarParameterValue(MaterialInstanceConstant, Name, Value);
@@ -94,10 +94,10 @@ bool UEditorPlusMaterialLibrary::SetTextureParameter(UMaterialInterface* Materia
     check(Material);
     check(Value);
 
-    auto MaterialInstance = Cast<UMaterialInstance>(Material);
+    const auto MaterialInstance = Cast<UMaterialInstance>(Material);
     if (MaterialInstance != nullptr)
     {
-        auto MaterialInstanceConstant = Cast<UMaterialInstanceConstant>(MaterialInstance);
+	    const auto MaterialInstanceConstant = Cast<UMaterialInstanceConstant>(MaterialInstance);
         if (MaterialInstanceConstant != nullptr)
         {
             return UMaterialEditingLibrary::SetMaterialInstanceTextureParameterValue(MaterialInstanceConstant, Name, Value);
@@ -105,4 +105,13 @@ bool UEditorPlusMaterialLibrary::SetTextureParameter(UMaterialInterface* Materia
     }
 
     return false;
+}
+
+FLinearColor UEditorPlusMaterialLibrary::GetAverageBaseColor(UMaterialInterface* Material)
+{
+	check(Material);
+
+	// @todo
+
+	return FLinearColor::Transparent;
 }

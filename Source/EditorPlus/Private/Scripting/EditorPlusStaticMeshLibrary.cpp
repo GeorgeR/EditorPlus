@@ -12,7 +12,7 @@ TArray<FString> UEditorPlusStaticMeshLibrary::GetMaterialSlots(UStaticMesh* Obje
     for (auto& Material : Object->StaticMaterials)
         if(bOnlyUnset && Material.MaterialInterface == nullptr)
             Result.Add(Material.MaterialSlotName.ToString());
-    
+
     return Result;
 }
 
@@ -86,7 +86,7 @@ void UEditorPlusStaticMeshLibrary::SetUVConstant(UStaticMesh* Object, const uint
 		TArray<FVector2D> TexCoords;
 		TexCoords.Init(UV, MeshDescription->VertexInstances().Num());
 #endif
-        
+
         Object->SetUVChannel(LODIndex, Channel, TexCoords);
     }
 }
