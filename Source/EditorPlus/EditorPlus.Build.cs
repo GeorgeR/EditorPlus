@@ -48,6 +48,7 @@ public class EditorPlus : ModuleRules
                 "Foliage",
 				"GraphEditor",
 				"InputCore",
+				"HierarchicalLODUtilities",
 				"Json",
                 "JsonUtilities",
                 "MaterialEditor",
