@@ -1,5 +1,7 @@
 #include "Scripting/EditorPlusObjectLibrary.h"
 
+#include "EditorPlusLog.h"
+
 void UEditorPlusObjectLibrary::AddToRoot(UObject* Object)
 {
     check(Object);

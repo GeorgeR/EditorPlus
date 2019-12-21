@@ -47,6 +47,7 @@ public class EditorPlus : ModuleRules
                 "AssetTools",
                 "Core",
                 "CoreUObject",
+                "DataValidation",
 				"EditorStyle",
                 "EditorSubsystem",
                 "Engine",
