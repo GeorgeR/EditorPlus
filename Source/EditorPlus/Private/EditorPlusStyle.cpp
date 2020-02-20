@@ -5,9 +5,7 @@
 #include "Slate/SlateGameResources.h"
 #include "Interfaces/IPluginManager.h"
 
-#include "EditorPlusModule.h"
-
-TSharedPtr<FSlateStyleSet> FEditorPlusStyle::StyleInstance = NULL;
+TSharedPtr<FSlateStyleSet> FEditorPlusStyle::StyleInstance = nullptr;
 
 void FEditorPlusStyle::Initialize()
 {

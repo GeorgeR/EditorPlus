@@ -24,6 +24,15 @@
 
 #define LOCTEXT_NAMESPACE "EditorPlus"
 
+void UEditorPlusLevelLibrary::LoadOrCreateLevel(const FString& AssetPath, const FString& TemplateAssetPath)
+{
+	// @todo
+	// 1. if current level == assetpath, return
+	// 2. if assetpath exists and is level, load, return
+	// 3. if assetpath exists and ISNT level, log error
+	// 3. if assetpath doesnt exist, create new level and load, based on template if sepecified
+}
+
 void UEditorPlusLevelLibrary::BuildHLOD(bool bForceRebuild)
 {
 	const auto World = FEditorPlusInternalUtilities::GetEditorWorldChecked();

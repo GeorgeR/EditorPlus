@@ -70,13 +70,17 @@ bool UEditorPlusAssetLibrary::SplitObjectPath_String(
 	FString& OutClassName, 
 	FString& OutExtension)
 {
-	FString LongPath;
-	if(FPackageName::TryConvertShortPackagePathToLongInObjectPath(Path, LongPath))
+	auto WorkingPath = Path;
+
+	auto FirstSlashIndex = -1;
+	if(WorkingPath.FindChar(TEXT('/'), FirstSlashIndex) && FirstSlashIndex > 0) // check if class name is present
 	{
-		
+		OutClassName = Path.Left(FirstSlashIndex).TrimEnd();
+		WorkingPath = WorkingPath.RightChop(FirstSlashIndex);
 	}
 	
-	FPaths::Split(Path, OutPath, OutName, OutExtension);
+	FPaths::Split(WorkingPath, OutPath, OutName, OutExtension);
+	auto Test = FPackageName::GetShortName(Path);
 
 	return true;
 	//return SplitObjectPath_ObjectPath(AssetData.ToSoftObjectPath(), OutPath, OutName, OutClassName, OutExtension);
