@@ -22,5 +22,11 @@
       "Type": "Editor",
       "LoadingPhase": "PostEngineInit"
     }
+  ],
+  "Plugins": [
+      {
+          "Name": "DataValidation",
+          "Enabled": true
+      }
   ]
 }

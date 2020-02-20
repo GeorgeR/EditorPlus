@@ -7,7 +7,8 @@
 #include "EditorPlusStyle.h"
 #include "EditorPlusCommands.h"
 
-DEFINE_LOG_CATEGORY(LogEditorPlus);
+#include "EditorValidatorSubsystem.h"
+#include "Validation/MetadataBasedValidator.h"
 
 #define LOCTEXT_NAMESPACE "EditorPlus"
 
@@ -24,6 +25,13 @@ void FEditorPlusModule::StartupModule()
 
 	DetailCustomizations->Startup();
 	ToolbarExtender->Extend();
+
+	auto* ValidatorSubsystem = GEditor->GetEditorSubsystem<UEditorValidatorSubsystem>();
+	if(ValidatorSubsystem)
+	{
+		const auto MetadataValidator = NewObject<UMetadataBasedValidator>(ValidatorSubsystem);
+		ValidatorSubsystem->AddValidator(MetadataValidator);
+	}
 }
 
 void FEditorPlusModule::ShutdownModule() 
