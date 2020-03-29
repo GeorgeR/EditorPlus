@@ -7,14 +7,40 @@
 
 #include "EditorPlusAssetLibrary.generated.h"
 
+class IAssetRegistry;
+class IAssetTools;
 class UFactory;
 class UStringAssetUserData;
+class UJsonAssetUserData;
 
 UCLASS()
 class EDITORPLUS_API UEditorPlusAssetLibrary
     : public UBlueprintFunctionLibrary
 {
     GENERATED_BODY()
+
+public:
+	UFUNCTION(BlueprintCallable, Category = "EditorPlus|Asset")
+	static bool GetAssetLike(const FString& Path, UPARAM(DisplayName = "Asset") FAssetData& OutAsset, UPARAM(DisplayName = "Path") FString& OutPath, TSubclassOf<UObject> Class = nullptr, const FString& Prefix = TEXT(""), const FString& Name = TEXT(""), const FString& Suffix = TEXT(""));
+
+public:
+	UFUNCTION(BlueprintCallable, Category = "EditorPlus|Asset", meta = (DisplayName = "Reimport Asset (Object)"))
+    static bool ReimportAsset_Object(UObject* Object);
+
+	UFUNCTION(BlueprintCallable, Category = "EditorPlus|Asset", meta = (DisplayName = "Reimport Asset (AssetData)"))
+    static bool ReimportAsset_AssetData(const FAssetData& AssetData);
+
+	UFUNCTION(BlueprintCallable, Category = "EditorPlus|Asset", meta = (DisplayName = "Reimport Asset (String)"))
+    static bool ReimportAsset_String(const FString& Path);
+
+	UFUNCTION(BlueprintCallable, Category = "EditorPlus|Asset", meta = (DisplayName = "Reimport Asset From File (Object)"))
+    static bool ReimportAssetFromFile_Object(UObject* Object, const FString& FilePath);
+
+	UFUNCTION(BlueprintCallable, Category = "EditorPlus|Asset", meta = (DisplayName = "Reimport Asset From File (AssetData)"))
+    static bool ReimportAssetFromFile_AssetData(const FAssetData& AssetData, const FString& FilePath);
+
+	UFUNCTION(BlueprintCallable, Category = "EditorPlus|Asset", meta = (DisplayName = "Reimport Asset From File (String)"))
+    static bool ReimportAssetFromFile_String(const FString& Path, const FString& FilePath);
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "EditorPlus|Asset", meta = (DisplayName = "Split Asset Path (Object)"))
@@ -39,6 +65,9 @@ public:
 public:
     UFUNCTION(BlueprintCallable, Category = "EditorPlus|Asset")
     static UStringAssetUserData* GetOrAddStringUserData(UObject* Object);
+
+	UFUNCTION(BlueprintCallable, Category = "EditorPlus|Asset")
+    static UJsonAssetUserData* GetOrAddJsonUserData(UObject* Object);
 
 	UFUNCTION(BlueprintCallable, Category = "EditorPlus|Asset")
 	static TArray<UObject*> GetSelected();
@@ -73,5 +102,9 @@ private:
 private:
 	UFUNCTION(BlueprintCallable, Category = "EditorPlus|Asset")
 	static FString GetCallingPath(UObject* Context) { return TEXT(""); }
-#pragma endregion Unimplemented (stubbed)	
+#pragma endregion Unimplemented (stubbed)
+
+private:
+	static IAssetRegistry& GetAssetRegistry();
+	static IAssetTools& GetAssetTools();
 };

@@ -361,6 +361,8 @@ void UEditorPlusLevelLibrary::LoadSubLevelAsync(const FString& Path)
 			World->FlushLevelStreaming();
 
 			const auto LoadedLevel = AssociatedStreamingLevel->GetLoadedLevel();
+			if(!LoadedLevel) // @todo: this was nullptr for me a few times - why?
+				return;
 
 			FUnmodifiableObject ImmuneLevel(LoadedLevel);
 			EditorLevelUtils::SetLevelVisibility(LoadedLevel, true, true);
