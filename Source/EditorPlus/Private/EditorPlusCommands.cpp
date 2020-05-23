@@ -13,7 +13,7 @@ FEditorPlusCommands::FEditorPlusCommands()
     : TCommands<FEditorPlusCommands>(TEXT("EditorPlus"),
     NSLOCTEXT("Contexts", "EditorPlus", "EditorPlus"),
     NAME_None,
-    FEditorPlusCommands::GetStyleSetName()) { }
+    FEditorPlusStyle::GetStyleSetName()) { }
 
 void FEditorPlusCommands::RegisterCommands()
 {

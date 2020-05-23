@@ -68,5 +68,14 @@ public class EditorPlus : ModuleRules
 				"UnrealEd",
                 "WorldBrowser"
 			});
+
+        if (Target.Version.MinorVersion >= 23)
+        {
+            PrivateDependencyModuleNames.AddRange(
+                new string[]
+                {
+                    "StaticMeshDescription"
+                });
+        }
 	}
 }

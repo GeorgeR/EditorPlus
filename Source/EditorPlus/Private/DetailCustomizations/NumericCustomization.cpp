@@ -1,4 +1,4 @@
-#include "NumericCustomization.h"
+#include "DetailCustomizations/NumericCustomization.h"
 
 #include "UObject/UnrealType.h"
 #include "Widgets/Text/STextBlock.h"

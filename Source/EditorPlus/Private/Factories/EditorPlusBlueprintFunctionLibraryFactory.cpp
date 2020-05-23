@@ -4,7 +4,7 @@
 #include "AssetTypeCategories.h"
 
 #include "EditorPlusBlueprintFunctionLibrary.h"
-#include "KismetEditorUtilities.h"
+#include "Kismet2/KismetEditorUtilities.h"
 
 #define LOCTEXT_NAMESPACE "EditorPlusFactories"
 

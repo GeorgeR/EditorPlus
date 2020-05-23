@@ -1,6 +1,6 @@
-#include "EditorPlusDetailCustomizations.h"
+#include "DetailCustomizations/EditorPlusDetailCustomizations.h"
 
-#include "ModuleManager.h"
+#include "Modules/ModuleManager.h"
 #include "PropertyEditorModule.h"
 
 #include "Vector2Customization.h"

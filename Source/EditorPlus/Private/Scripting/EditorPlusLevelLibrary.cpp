@@ -17,10 +17,11 @@
 
 #include "EditorPlusInternalUtilties.h"
 
-#include "Private/LevelCollectionModel.h"
-#include "Private/LevelModel.h"
-#include "Private/Tiles/WorldTileModel.h"
-#include "Private/Tiles/WorldTileDetails.h"
+// @note these are private
+#include "LevelCollectionModel.h"
+#include "LevelModel.h"
+#include "Tiles/WorldTileModel.h"
+#include "Tiles/WorldTileDetails.h"
 
 #define LOCTEXT_NAMESPACE "EditorPlus"
 

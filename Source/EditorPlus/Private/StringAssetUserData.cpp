@@ -1,6 +1,6 @@
 #include "StringAssetUserData.h"
-#include "JsonReader.h"
-#include "JsonSerializer.h"
+#include "Serialization/JsonReader.h"
+#include "Serialization/JsonSerializer.h"
 
 TSharedPtr<FJsonObject> UStringAssetUserData::TryDeserialize()
 {

@@ -3,7 +3,7 @@
 #include "Interfaces/Interface_AssetUserData.h"
 #include "ContentBrowserModule.h"
 #include "IContentBrowserSingleton.h"
-#include "ModuleManager.h"
+#include "Modules/ModuleManager.h"
 #include "AssetData.h"
 #include "AssetToolsModule.h"
 #include "AssetRegistryModule.h"

@@ -5,7 +5,7 @@
 #include "MaterialUtilities/Public/MaterialUtilities.h"
 #include "Materials/MaterialInstanceConstant.h"
 #include "AssetRegistryModule.h"
-#include "ModuleManager.h"
+#include "Modules/ModuleManager.h"
 #include "ObjectTools.h"
 #include "Tests/AutomationEditorCommon.h"
 #include "Engine/Texture.h"

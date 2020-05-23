@@ -1,6 +1,6 @@
 #include "EditorPlusModule.h"
 
-#include "ModuleManager.h"
+#include "Modules/ModuleManager.h"
 
 #include "DetailCustomizations/EditorPlusDetailCustomizations.h"
 #include "UI/EditorPlusToolbarExtender.h"
