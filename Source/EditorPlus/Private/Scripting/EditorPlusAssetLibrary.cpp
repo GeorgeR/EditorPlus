@@ -10,8 +10,149 @@
 #include "FileHelpers.h"
 #include "IAssetTools.h"
 #include "PackageTools.h"
+#include "EditorReimportHandler.h"
+#include "Engine/StaticMesh.h"
+#include "Factories/ReimportFbxStaticMeshFactory.h"
 
 #include "StringAssetUserData.h"
+#include "JsonAssetUserData.h"
+
+// fuzzy search
+bool UEditorPlusAssetLibrary::GetAssetLike(const FString& Path, FAssetData& OutAsset, FString& OutPath, TSubclassOf<UObject> Class, const FString& Prefix, const FString& Name, const FString& Suffix)
+{
+	check(!Path.IsEmpty());
+	check(Class != nullptr || !Name.IsEmpty());
+
+	TArray<FAssetData> Assets;
+	auto& AssetRegistry = GetAssetRegistry();
+	if(!AssetRegistry.GetAssetsByPath(*Path, Assets, true))
+		return false;
+
+	FARFilter Filter;
+	Filter.bRecursiveClasses = true;
+	Filter.bRecursivePaths = true;
+	if(Class != nullptr)
+		Filter.ClassNames.Add(*Class->GetName());
+
+	AssetRegistry.RunAssetsThroughFilter(Assets, Filter);
+
+	if(Assets.Num() == 0)
+		return false;
+
+	for (auto AssetDataIdx = Assets.Num() - 1; AssetDataIdx >= 0; --AssetDataIdx)
+	{
+		const auto& AssetData = Assets[AssetDataIdx];
+		auto AssetName = AssetData.AssetName.ToString();
+
+		if(!Prefix.IsEmpty())
+			if(AssetName.StartsWith(Prefix))
+				AssetName.RemoveFromStart(Prefix);
+			else
+				continue;
+
+		if(!Suffix.IsEmpty() && !AssetName.EndsWith(Suffix))
+			if(AssetName.EndsWith(Prefix))
+				AssetName.RemoveFromEnd(Prefix);
+			else
+				continue;
+
+		if(!Name.IsEmpty())
+			if(AssetName.MatchesWildcard(Name))
+			{
+				OutAsset = AssetData;
+				OutPath = AssetData.GetFullName();
+
+				FString PackageRoot;
+				FString ClassName;
+				FString PackageName;
+				FString ObjectName;
+				FString SubObjectName;
+				FPackageName::SplitFullObjectPath(OutPath, ClassName, PackageName, ObjectName, SubObjectName);
+				OutPath = PackageName;
+				return true;
+			}
+	}
+
+	OutPath = FPaths::Combine(Path, Prefix + Name + Suffix);
+	
+	return false;
+}
+
+bool UEditorPlusAssetLibrary::ReimportAsset_Object(UObject* Object)
+{
+	check(Object);
+
+	if(!Object->IsAsset())
+		return false;
+
+	TArray<UObject*> Objects;
+	Objects.Add(Object);
+	FReimportManager::Instance()->ValidateAllSourceFileAndReimport(Objects, true, INDEX_NONE, false);
+	return true;
+}
+
+bool UEditorPlusAssetLibrary::ReimportAsset_AssetData(const FAssetData& AssetData)
+{
+	check(AssetData.IsValid());
+
+	auto* Object = AssetData.GetAsset();
+	return ReimportAsset_Object(Object);
+}
+
+bool UEditorPlusAssetLibrary::ReimportAsset_String(const FString& Path)
+{
+	check(!Path.IsEmpty());
+
+	auto* Object = StaticLoadObject(UObject::StaticClass(), nullptr, *Path, nullptr, LOAD_None, nullptr, true, nullptr);
+	if(Object == nullptr)
+	{
+		FSoftObjectPath ObjectPath(Path);
+		if(ObjectPath.FixupCoreRedirects())
+			Object = LoadObject<UObject>(nullptr, *ObjectPath.ToString());
+	}
+
+	return ReimportAsset_Object(Object);
+}
+
+bool UEditorPlusAssetLibrary::ReimportAssetFromFile_Object(UObject* Object, const FString& FilePath)
+{
+	check(Object);
+
+	if(!Object->IsAsset())
+		return false;
+
+	TArray<UObject*> Objects;
+	Objects.Add(Object);
+
+	FReimportHandler* Handler = nullptr;
+	if(Object->GetClass() == UStaticMesh::StaticClass())
+		Handler = StaticCast<FReimportHandler*>(GetMutableDefault<UReimportFbxStaticMeshFactory>());
+	
+	return FReimportManager::Instance()->Reimport(Object, false, false, FilePath, Handler);
+}
+
+bool UEditorPlusAssetLibrary::ReimportAssetFromFile_AssetData(const FAssetData& AssetData, const FString& FilePath)
+{
+	check(AssetData.IsValid());
+
+	auto* Object = AssetData.GetAsset();
+	return ReimportAssetFromFile_Object(Object, FilePath);
+}
+
+bool UEditorPlusAssetLibrary::ReimportAssetFromFile_String(const FString& Path, const FString& FilePath)
+{
+	check(!Path.IsEmpty());
+
+	auto* Object = StaticLoadObject(UObject::StaticClass(), nullptr, *Path, nullptr, LOAD_None, nullptr, true, nullptr);
+	if(Object == nullptr)
+	{
+		FSoftObjectPath ObjectPath(Path);
+		if(ObjectPath.FixupCoreRedirects())
+			Object = LoadObject<UObject>(nullptr, *ObjectPath.ToString());
+	}
+
+	return ReimportAssetFromFile_Object(Object, FilePath);
+}
 
 bool UEditorPlusAssetLibrary::SplitObjectPath_Object(
 	UObject* Object, 
@@ -70,13 +211,17 @@ bool UEditorPlusAssetLibrary::SplitObjectPath_String(
 	FString& OutClassName, 
 	FString& OutExtension)
 {
-	FString LongPath;
-	if(FPackageName::TryConvertShortPackagePathToLongInObjectPath(Path, LongPath))
+	auto WorkingPath = Path;
+
+	auto FirstSlashIndex = -1;
+	if(WorkingPath.FindChar(TEXT('/'), FirstSlashIndex) && FirstSlashIndex > 0) // check if class name is present
 	{
-		
+		OutClassName = Path.Left(FirstSlashIndex).TrimEnd();
+		WorkingPath = WorkingPath.RightChop(FirstSlashIndex);
 	}
 	
-	FPaths::Split(Path, OutPath, OutName, OutExtension);
+	FPaths::Split(WorkingPath, OutPath, OutName, OutExtension);
+	auto Test = FPackageName::GetShortName(Path);
 
 	return true;
 	//return SplitObjectPath_ObjectPath(AssetData.ToSoftObjectPath(), OutPath, OutName, OutClassName, OutExtension);
@@ -84,13 +229,13 @@ bool UEditorPlusAssetLibrary::SplitObjectPath_String(
 
 UObject* UEditorPlusAssetLibrary::GetOrCreateAsset(const FString& Path, const FString& Name, TSubclassOf<UObject> Class)
 {
-	auto& AssetRegistry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry")).Get();
+	auto& AssetRegistry = GetAssetRegistry();
 	const auto ObjectPath = FName(*(Path + TEXT("/") + Name));
 	const auto Asset = AssetRegistry.GetAssetByObjectPath(ObjectPath);
 	if(Asset.IsValid())
 		return Asset.GetAsset();
 
-	auto& AssetTools = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools").Get();
+	auto& AssetTools = GetAssetTools();
 	return AssetTools.CreateAsset(Name, Path, Class, nullptr);
 }
 
@@ -104,6 +249,25 @@ UStringAssetUserData* UEditorPlusAssetLibrary::GetOrAddStringUserData(UObject* O
         if (!Result)
         {
             Result = NewObject<UStringAssetUserData>();
+            AssetUserData->AddAssetUserData(Result);
+        }
+
+        return Result;
+    }
+
+    return nullptr;
+}
+
+UJsonAssetUserData* UEditorPlusAssetLibrary::GetOrAddJsonUserData(UObject* Object)
+{
+	check(Object);
+
+    if (auto AssetUserData = Cast<IInterface_AssetUserData>(Object))
+    {
+        auto Result = Cast<UJsonAssetUserData>(AssetUserData->GetAssetUserDataOfClass(UJsonAssetUserData::StaticClass()));
+        if (!Result)
+        {
+            Result = NewObject<UJsonAssetUserData>();
             AssetUserData->AddAssetUserData(Result);
         }
 
@@ -128,13 +292,11 @@ TArray<UObject*> UEditorPlusAssetLibrary::GetSelected()
 
 void UEditorPlusAssetLibrary::RenameAsset(UObject* Asset, const FString& NewName)
 {
-	auto& AssetToolsModule = FModuleManager::LoadModuleChecked<FAssetToolsModule>(TEXT("AssetTools"));
-
 	TArray<FAssetRenameData> AssetsAndNames;
 	const auto PackagePath = FPackageName::GetLongPackagePath(Asset->GetOutermost()->GetName());
 	AssetsAndNames.Add(FAssetRenameData(Asset, PackagePath, NewName));
 	
-	AssetToolsModule.Get().RenameAssetsWithDialog(AssetsAndNames);
+	GetAssetTools().RenameAssetsWithDialog(AssetsAndNames);
 }
 
 TArray<FString> UEditorPlusAssetLibrary::GetAllPackageFiles()
@@ -172,7 +334,7 @@ TArray<FString> UEditorPlusAssetLibrary::GetAllAssetFiles()
 
 TArray<FString> UEditorPlusAssetLibrary::GetAllMapFiles()
 {
-		TArray<FString> Result;
+	TArray<FString> Result;
 	
 	auto AllPackageFileNames = GetAllPackageFiles();
 	for(auto& FileName : AllPackageFileNames)
@@ -192,8 +354,8 @@ TArray<FString> UEditorPlusAssetLibrary::GetWithCustomVersion(const FGuid Versio
 {
 	TArray<FString> AffectedAssets;
 
-	auto& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
-	if (AssetRegistryModule.Get().IsLoadingAssets())
+	auto& AssetRegistry = GetAssetRegistry();
+	if (AssetRegistry.IsLoadingAssets())
 		return AffectedAssets;
 
 	FARFilter Filter;
@@ -201,12 +363,10 @@ TArray<FString> UEditorPlusAssetLibrary::GetWithCustomVersion(const FGuid Versio
 	Filter.bRecursivePaths = true;
 
 	TArray<FAssetData> Assets;
-	AssetRegistryModule.Get().GetAllAssets(Assets);
+	AssetRegistry.GetAllAssets(Assets);
 
 	if (Assets.Num() == 0)
 		return AffectedAssets;
-
-	auto& AssetToolsModule = FModuleManager::LoadModuleChecked<FAssetToolsModule>(TEXT("AssetTools"));
 
     auto TaskLabel = FText::FromString(TEXT("Checking Assets for Custom Version"));
 	FScopedSlowTask Task(Assets.Num(), TaskLabel);
@@ -265,3 +425,15 @@ int32 UEditorPlusAssetLibrary::ResaveWithCustomVersion(FGuid VersionGuid, int32 
 }
 
 #pragma endregion Not Working
+
+IAssetRegistry& UEditorPlusAssetLibrary::GetAssetRegistry()
+{
+	auto& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
+	return AssetRegistryModule.Get();
+}
+
+IAssetTools& UEditorPlusAssetLibrary::GetAssetTools()
+{
+	auto& AssetToolsModule = FModuleManager::LoadModuleChecked<FAssetToolsModule>(TEXT("AssetTools"));
+	return AssetToolsModule.Get();
+}

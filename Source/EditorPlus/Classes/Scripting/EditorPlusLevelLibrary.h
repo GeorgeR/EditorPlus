@@ -17,6 +17,11 @@ class EDITORPLUS_API UEditorPlusLevelLibrary
     GENERATED_BODY()
 
 public:
+	/** Loads the level if it exists, creates it if it doesn't, optionally based on a template. */
+	UFUNCTION(BlueprintCallable, Category = "EditorPlus|Level|Build")
+	static void LoadOrCreateLevel(const FString& AssetPath, const FString& TemplateAssetPath = TEXT(""));
+
+public:
 	UFUNCTION(BlueprintCallable, Category = "EditorPlus|Level|Build")
 	static void BuildHLOD(bool bForceRebuild = false);
 
