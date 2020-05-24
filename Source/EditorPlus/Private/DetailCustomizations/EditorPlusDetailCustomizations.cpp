@@ -43,7 +43,8 @@ void FEditorPlusDetailCustomizations::RegisterObjectCustomizations()
 
 void FEditorPlusDetailCustomizations::RegisterPropertyTypeCustomizations()
 {
-    REGISTER_PROPERTY_CUSTOMIZATION(Vector2D);
+	// @todo: the properties dont even appear with this
+    //REGISTER_PROPERTY_CUSTOMIZATION(Vector2D);
 }
 
 void FEditorPlusDetailCustomizations::RegisterCustomClassLayout(FName ClassName, FOnGetDetailCustomizationInstance DetailLayoutDelegate)

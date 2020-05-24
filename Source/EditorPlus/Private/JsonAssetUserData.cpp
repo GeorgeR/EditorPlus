@@ -1,7 +1,6 @@
 #include "JsonAssetUserData.h"
 
-#include "JsonReader.h"
-#include "JsonSerializer.h"
+#include "Json.h"
 
 #if WITH_EDITORONLY_DATA
 
