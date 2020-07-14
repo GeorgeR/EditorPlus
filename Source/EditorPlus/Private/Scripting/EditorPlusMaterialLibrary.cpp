@@ -52,19 +52,7 @@ UMaterialInterface* UEditorPlusMaterialLibrary::CreateMaterialInstance(UMaterial
 
 bool UEditorPlusMaterialLibrary::SetVectorParameter(UMaterialInterface* Material, const FName Name, FLinearColor Value)
 {
-    check(Material);
-
-    const auto MaterialInstance = Cast<UMaterialInstance>(Material);
-    if (MaterialInstance != nullptr)
-    {
-	    const auto MaterialInstanceConstant = Cast<UMaterialInstanceConstant>(MaterialInstance);
-        if (MaterialInstanceConstant != nullptr)
-        {
-            return UMaterialEditingLibrary::SetMaterialInstanceVectorParameterValue(MaterialInstanceConstant, Name, Value);
-        }
-    }
-
-    return false;
+    return SetMaterialInstanceParameter<FLinearColor>(Material, Name, Value, UMaterialEditingLibrary::SetMaterialInstanceVectorParameterValue);
 }
 
 bool UEditorPlusMaterialLibrary::SetVectorParameter_FromVector(UMaterialInterface* Material, const FName Name, FVector Value)
@@ -74,37 +62,14 @@ bool UEditorPlusMaterialLibrary::SetVectorParameter_FromVector(UMaterialInterfac
 
 bool UEditorPlusMaterialLibrary::SetScalarParameter(UMaterialInterface* Material, const FName Name, float Value)
 {
-    check(Material);
-
-    const auto MaterialInstance = Cast<UMaterialInstance>(Material);
-    if (MaterialInstance != nullptr)
-    {
-	    const auto MaterialInstanceConstant = Cast<UMaterialInstanceConstant>(MaterialInstance);
-        if (MaterialInstanceConstant != nullptr)
-        {
-            return UMaterialEditingLibrary::SetMaterialInstanceScalarParameterValue(MaterialInstanceConstant, Name, Value);
-        }
-    }
-
-    return false;
+    return SetMaterialInstanceParameter<float>(Material, Name, Value, UMaterialEditingLibrary::SetMaterialInstanceScalarParameterValue);
 }
 
 bool UEditorPlusMaterialLibrary::SetTextureParameter(UMaterialInterface* Material, const FName Name, UTexture* Value)
 {
-    check(Material);
     check(Value);
 
-    const auto MaterialInstance = Cast<UMaterialInstance>(Material);
-    if (MaterialInstance != nullptr)
-    {
-	    const auto MaterialInstanceConstant = Cast<UMaterialInstanceConstant>(MaterialInstance);
-        if (MaterialInstanceConstant != nullptr)
-        {
-            return UMaterialEditingLibrary::SetMaterialInstanceTextureParameterValue(MaterialInstanceConstant, Name, Value);
-        }
-    }
-
-    return false;
+    return SetMaterialInstanceParameter<UTexture*>(Material, Name, Value, UMaterialEditingLibrary::SetMaterialInstanceTextureParameterValue);
 }
 
 FLinearColor UEditorPlusMaterialLibrary::GetAverageBaseColor(UMaterialInterface* Material)
@@ -114,4 +79,25 @@ FLinearColor UEditorPlusMaterialLibrary::GetAverageBaseColor(UMaterialInterface*
 	// @todo
 
 	return FLinearColor::Transparent;
+}
+
+template <typename T>
+bool UEditorPlusMaterialLibrary::SetMaterialInstanceParameter(
+    UMaterialInterface* Material, const FName Name, T Value,
+    TFunctionRef<bool(UMaterialInstanceConstant*, FName, T)> Func)
+{
+    const auto MaterialInstance = Cast<UMaterialInstance>(Material);
+    if (MaterialInstance != nullptr)
+    {
+	    const auto MaterialInstanceConstant = Cast<UMaterialInstanceConstant>(MaterialInstance);
+        if (MaterialInstanceConstant != nullptr)
+        {
+            FMaterialUpdateContext UpdateContext(FMaterialUpdateContext::EOptions::SyncWithRenderingThread);
+            UpdateContext.AddMaterialInstance(MaterialInstanceConstant);
+
+            return Func(MaterialInstanceConstant, Name, Value);
+        }
+    }
+
+    return false;
 }

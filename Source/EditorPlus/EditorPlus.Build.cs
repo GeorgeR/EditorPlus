@@ -63,6 +63,8 @@ public class EditorPlus : ModuleRules
                 "Projects",
 				"PropertyEditor",
                 "RawMesh",
+				"RenderCore",
+				"RHI",
 				"Slate",
 				"SlateCore",
 				"UnrealEd",

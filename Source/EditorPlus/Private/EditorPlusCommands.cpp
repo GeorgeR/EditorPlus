@@ -6,6 +6,7 @@
 #include "UObject/Object.h"
 
 #include "Scripting/EditorPlusUtilityLibrary.h"
+#include "EditorPlusStyle.h"
 
 #define LOCTEXT_NAMESPACE "EditorPlus"
 
@@ -13,7 +14,7 @@ FEditorPlusCommands::FEditorPlusCommands()
     : TCommands<FEditorPlusCommands>(TEXT("EditorPlus"),
     NSLOCTEXT("Contexts", "EditorPlus", "EditorPlus"),
     NAME_None,
-    FEditorPlusCommands::GetStyleSetName()) { }
+    FEditorPlusStyle::GetStyleSetName()) { } // @bug: GetStyleSetName throws error on package
 
 void FEditorPlusCommands::RegisterCommands()
 {
