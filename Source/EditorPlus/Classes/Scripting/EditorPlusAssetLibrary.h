@@ -2,7 +2,7 @@
 
 #include "CoreUObject.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
-#include "AssetRegistryInterface.h"
+#include "Misc/AssetRegistryInterface.h"
 #include "AssetData.h"
 
 #include "EditorPlusAssetLibrary.generated.h"

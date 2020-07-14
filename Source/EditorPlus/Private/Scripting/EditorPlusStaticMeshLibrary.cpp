@@ -4,6 +4,10 @@
 #include "Materials/MaterialInterface.h"
 #include "MeshDescription.h"
 
+#if ENGINE_MINOR_VERSION >= 23
+#include "StaticMeshAttributes.h"
+#endif
+
 TArray<FString> UEditorPlusStaticMeshLibrary::GetMaterialSlots(UStaticMesh* Object, bool bOnlyUnset)
 {
     check(Object);
@@ -89,4 +93,45 @@ void UEditorPlusStaticMeshLibrary::SetUVConstant(UStaticMesh* Object, const uint
 
         Object->SetUVChannel(LODIndex, Channel, TexCoords);
     }
+}
+
+bool UEditorPlusStaticMeshLibrary::GetUniformOrPerVertexColors(UStaticMesh* Object, TArray<FColor>& OutColors, FColor& OutColor, const int32 LODIndex)
+{
+	check(Object);
+
+#if ENGINE_MINOR_VERSION >= 22
+    const auto MeshDescription = Object->GetMeshDescription(LODIndex);
+#else
+    const auto MeshDescription = Object->GetOriginalMeshDescription(LODIndex);
+#endif
+
+	bool bHasColors = false;
+#if ENGINE_MINOR_VERSION >= 23
+	bHasColors = MeshDescription->VertexInstanceAttributes().HasAttribute(MeshAttribute::VertexInstance::Color);
+#else
+		// @todo
+#endif
+
+	if(!bHasColors)
+		return false;
+
+#if ENGINE_MINOR_VERSION >= 23
+    const TVertexInstanceAttributesConstRef<FVector4> VertexInstanceColors = MeshDescription->VertexInstanceAttributes().GetAttributesRef<FVector4>(MeshAttribute::VertexInstance::Color);
+	OutColors.SetNum(VertexInstanceColors.GetNumElements());
+	if(OutColors.Num() <= 0)
+		return false;
+
+	for(const auto& VertexInstanceID : MeshDescription->VertexInstances().GetElementIDs())
+	{
+		const auto& VertexInstanceColor = VertexInstanceColors[VertexInstanceID];
+		const FLinearColor LinearColor(VertexInstanceColor);
+		OutColors.Emplace(LinearColor.ToFColor(true));
+	    //OutColors[VertexInstanceID.GetValue()] = ;
+	}
+	OutColor = OutColors[0];
+#else
+	// @todo
+#endif
+
+	return OutColors.Num() > 0;
 }

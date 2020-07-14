@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include <SoftObjectPtr.h>
+#include "UObject/SoftObjectPtr.h"
 
 namespace Validation
 {

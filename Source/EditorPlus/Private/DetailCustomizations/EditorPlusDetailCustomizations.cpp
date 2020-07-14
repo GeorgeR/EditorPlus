@@ -1,6 +1,6 @@
-#include "EditorPlusDetailCustomizations.h"
+#include "DetailCustomizations/EditorPlusDetailCustomizations.h"
 
-#include "ModuleManager.h"
+#include "Modules/ModuleManager.h"
 #include "PropertyEditorModule.h"
 
 #include "Vector2Customization.h"
@@ -43,7 +43,8 @@ void FEditorPlusDetailCustomizations::RegisterObjectCustomizations()
 
 void FEditorPlusDetailCustomizations::RegisterPropertyTypeCustomizations()
 {
-    REGISTER_PROPERTY_CUSTOMIZATION(Vector2D);
+	// @todo: the properties dont even appear with this
+    //REGISTER_PROPERTY_CUSTOMIZATION(Vector2D);
 }
 
 void FEditorPlusDetailCustomizations::RegisterCustomClassLayout(FName ClassName, FOnGetDetailCustomizationInstance DetailLayoutDelegate)

@@ -30,4 +30,8 @@ public:
     /* For encoding an entire mesh as a "pixel" in a UV */
     UFUNCTION(BlueprintCallable, Category = "Editor Plus | StaticMesh")
     static void SetUVConstant(UStaticMesh* Object, const uint8& Channel, const FVector2D& UV);
+
+	/* Returns false if no vertex colors present */
+	UFUNCTION(BlueprintCallable, Category = "Editor Plus | StaticMesh")
+	static bool GetUniformOrPerVertexColors(UStaticMesh* Object, UPARAM(DisplayName = "Colors") TArray<FColor>& OutColors, UPARAM(DisplayName = "Uniform Color") FColor& OutColor, const int32 LODIndex = 0);
 };
