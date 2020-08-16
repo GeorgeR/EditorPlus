@@ -12,7 +12,7 @@
 
 void FEditorPlusDetailCustomizations::Startup()
 {
-    FPropertyEditorModule& PropertyEditorModule = FModuleManager::GetModuleChecked<FPropertyEditorModule>(TEXT("PropertyEditor"));
+    auto& PropertyEditorModule = FModuleManager::GetModuleChecked<FPropertyEditorModule>(TEXT("PropertyEditor"));
 
     RegisterPropertyTypeCustomizations();
     RegisterObjectCustomizations();
@@ -24,7 +24,7 @@ void FEditorPlusDetailCustomizations::Shutdown()
 {
     if (FModuleManager::Get().IsModuleLoaded(TEXT("PropertyEditor")))
     {
-        FPropertyEditorModule& PropertyEditorModule = FModuleManager::GetModuleChecked<FPropertyEditorModule>(TEXT("PropertyEditor"));
+        auto& PropertyEditorModule = FModuleManager::GetModuleChecked<FPropertyEditorModule>(TEXT("PropertyEditor"));
 
         for (auto& ClassName : RegisteredClassNames)
             PropertyEditorModule.UnregisterCustomClassLayout(ClassName);
@@ -54,7 +54,7 @@ void FEditorPlusDetailCustomizations::RegisterCustomClassLayout(FName ClassName,
     RegisteredClassNames.Add(ClassName);
 
     static FName PropertyEditor(TEXT("PropertyEditor"));
-    FPropertyEditorModule& PropertyEditorModule = FModuleManager::GetModuleChecked<FPropertyEditorModule>(PropertyEditor);
+    auto& PropertyEditorModule = FModuleManager::GetModuleChecked<FPropertyEditorModule>(PropertyEditor);
     PropertyEditorModule.RegisterCustomClassLayout(ClassName, DetailLayoutDelegate);
 }
 
@@ -65,7 +65,7 @@ void FEditorPlusDetailCustomizations::RegisterCustomPropertyTypeLayout(FName Pro
     RegisteredPropertyTypeNames.Add(PropertyTypeName);
 
     static FName PropertyEditor(TEXT("PropertyEditor"));
-    FPropertyEditorModule& PropertyEditorModule = FModuleManager::GetModuleChecked<FPropertyEditorModule>(PropertyEditor);
+    auto& PropertyEditorModule = FModuleManager::GetModuleChecked<FPropertyEditorModule>(PropertyEditor);
     PropertyEditorModule.RegisterCustomPropertyTypeLayout(PropertyTypeName, PropertyTypeLayoutDelegate);
 }
 

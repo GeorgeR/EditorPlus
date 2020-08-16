@@ -94,20 +94,20 @@ void FNumericCustomization::MakeHeaderRow(TSharedRef<IPropertyHandle>& StructPro
 
 bool FNumericCustomization::IsSupported(TSharedRef<IPropertyHandle>& PropertyHandle)
 {
-    const UClass* PropertyClass = PropertyHandle->GetPropertyClass();
+    const auto* PropertyClass = PropertyHandle->GetPropertyClass();
 
-    if (PropertyClass == UFloatProperty::StaticClass()
-        || PropertyClass == UIntProperty::StaticClass()
-        || PropertyClass == UByteProperty::StaticClass())
+    if (PropertyClass == FFloatProperty::StaticClass()
+        || PropertyClass == FIntProperty::StaticClass()
+        || PropertyClass == FByteProperty::StaticClass())
         return true;
 
-    if (PropertyClass == UEnumProperty::StaticClass())
+    if (PropertyClass == FEnumProperty::StaticClass())
     {
-        const UEnumProperty* EnumPropertyClass = static_cast<const UEnumProperty*>(PropertyHandle->GetProperty());
-        const UProperty* Enum = EnumPropertyClass->GetUnderlyingProperty();
-        const UClass* EnumClass = Enum->GetClass();
-        if (EnumClass == UByteProperty::StaticClass()
-            || EnumClass == UIntProperty::StaticClass())
+        const auto* EnumPropertyClass = static_cast<const FEnumProperty*>(PropertyHandle->GetProperty());
+        const auto* Enum = EnumPropertyClass->GetUnderlyingProperty();
+        const auto* EnumClass = Enum->GetClass();
+        if (EnumClass == FByteProperty::StaticClass()
+            || EnumClass == FIntProperty::StaticClass())
             return true;
     }
 
@@ -122,25 +122,25 @@ TSharedRef<SWidget> FNumericCustomization::MakeChildWidget(TSharedRef<IPropertyH
         return SNullWidget::NullWidget;
     }
 
-    const UClass* PropertyClass = PropertyHandle->GetPropertyClass();
+    const auto* PropertyClass = PropertyHandle->GetPropertyClass();
 
-    if (PropertyClass == UFloatProperty::StaticClass())
+    if (PropertyClass == FFloatProperty::StaticClass())
         return MakeNumericWidget<float>(StructurePropertyHandle, PropertyHandle);
 
-    if (PropertyClass == UIntProperty::StaticClass())
+    if (PropertyClass == FIntProperty::StaticClass())
         return MakeNumericWidget<int32>(StructurePropertyHandle, PropertyHandle);
 
-    if (PropertyClass == UByteProperty::StaticClass())
+    if (PropertyClass == FByteProperty::StaticClass())
         return MakeNumericWidget<uint8>(StructurePropertyHandle, PropertyHandle);
 
-    if (PropertyClass == UEnumProperty::StaticClass())
+    if (PropertyClass == FEnumProperty::StaticClass())
     {
-        const UEnumProperty* EnumPropertyClass = static_cast<const UEnumProperty*>(PropertyHandle->GetProperty());
-        const UProperty* Enum = EnumPropertyClass->GetUnderlyingProperty();
-        const UClass* EnumClass = Enum->GetClass();
-        if (EnumClass == UByteProperty::StaticClass())
+        const auto* EnumPropertyClass = static_cast<const FEnumProperty*>(PropertyHandle->GetProperty());
+        const auto* Enum = EnumPropertyClass->GetUnderlyingProperty();
+        const auto* EnumClass = Enum->GetClass();
+        if (EnumClass == FByteProperty::StaticClass())
             return MakeNumericWidget<uint8>(StructurePropertyHandle, PropertyHandle);
-        else if (EnumClass == UIntProperty::StaticClass())
+        else if (EnumClass == FIntProperty::StaticClass())
             return MakeNumericWidget<int32>(StructurePropertyHandle, PropertyHandle);
     }
 
@@ -161,7 +161,7 @@ void FNumericCustomization::GetSortedChildren(TSharedRef<IPropertyHandle> Struct
 template <typename TNumericType>
 void FNumericCustomization::ExtractNumericMetadata(TSharedRef<IPropertyHandle>& PropertyHandle, TOptional<TNumericType>& MinValue, TOptional<TNumericType>& MaxValue, TOptional<TNumericType>& SliderMinValue, TOptional<TNumericType>& SliderMaxValue, TNumericType& SliderExponent, TNumericType& Delta, int32 &ShiftMouseMovePixelPerDelta, bool& SupportDynamicSliderMaxValue, bool& SupportDynamicSliderMinValue)
 {
-    UProperty* Property = PropertyHandle->GetProperty();
+    auto* Property = PropertyHandle->GetProperty();
     
     const FString& MetaUIMinString = Property->GetMetaData(TEXT("UIMin"));
     const FString& MetaUIMaxString = Property->GetMetaData(TEXT("UIMax"));

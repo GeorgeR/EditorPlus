@@ -17,5 +17,9 @@ public:
 	EDataValidationResult ValidateLoadedAsset_Implementation(UObject* InAsset, TArray<FText>& ValidationErrors) override;
 
 protected:
+	#if ENGINE_MINOR_VERSION <= 24
 	bool CheckRequired(UObject* Outer, UProperty* Property) const;
+	#else
+	bool CheckRequired(UObject* Outer, FProperty* Property) const;
+	#endif
 };

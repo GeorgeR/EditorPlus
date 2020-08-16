@@ -12,7 +12,11 @@ EDataValidationResult UMetadataBasedValidator::ValidateLoadedAsset_Implementatio
 	auto bHasFailedOnce = false;
 
 	const auto Class = InAsset->GetClass();
+	#if ENGINE_MINOR_VERSION <= 24
 	for(TFieldIterator<UProperty> Iterator(Class); Iterator; ++Iterator)
+	#else
+	for(TFieldIterator<FProperty> Iterator(Class); Iterator; ++Iterator)
+	#endif
 	{
 		auto* Property = *Iterator;
 		
@@ -33,6 +37,7 @@ EDataValidationResult UMetadataBasedValidator::ValidateLoadedAsset_Implementatio
 	return GetValidationResult();
 }
 
+#if ENGINE_MINOR_VERSION <= 24
 bool UMetadataBasedValidator::CheckRequired(UObject* Outer, UProperty* Property) const
 {
 	if(const auto SoftObjectProperty = Cast<USoftObjectProperty>(Property))
@@ -44,5 +49,18 @@ bool UMetadataBasedValidator::CheckRequired(UObject* Outer, UProperty* Property)
 	
 	return true;
 }
+#else
+bool UMetadataBasedValidator::CheckRequired(UObject* Outer, FProperty* Property) const
+{
+	if(const auto SoftObjectProperty = CastField<FSoftObjectProperty>(Property))
+	{
+		const auto Value = SoftObjectProperty->GetPropertyValue_InContainer(Outer);
+		if(Value.IsNull())
+			return false;
+	}
+	
+	return true;
+}
+#endif
 
 #undef LOCTEXT_NAMESPACE
