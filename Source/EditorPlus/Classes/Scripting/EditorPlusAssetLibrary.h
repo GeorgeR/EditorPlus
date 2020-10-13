@@ -89,6 +89,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "EditorPlus|Asset")
 	static TArray<FString> GetAllMapFiles();
 
+public:
+	UFUNCTION(BlueprintCallable, Category = "EditorPlus|Asset")
+	static TArray<FString> GetFilePaths(const TArray<FAssetData>& AssetData, bool bRelativeToProject = true);
+
 #pragma region Not Working
 private:
 	UFUNCTION(BlueprintCallable, Category = "EditorPlus|Asset")

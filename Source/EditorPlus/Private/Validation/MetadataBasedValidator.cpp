@@ -12,7 +12,7 @@ EDataValidationResult UMetadataBasedValidator::ValidateLoadedAsset_Implementatio
 	auto bHasFailedOnce = false;
 
 	const auto Class = InAsset->GetClass();
-	for(TFieldIterator<UProperty> Iterator(Class); Iterator; ++Iterator)
+	for(TFieldIterator<FProperty> Iterator(Class); Iterator; ++Iterator)
 	{
 		auto* Property = *Iterator;
 		
@@ -33,9 +33,9 @@ EDataValidationResult UMetadataBasedValidator::ValidateLoadedAsset_Implementatio
 	return GetValidationResult();
 }
 
-bool UMetadataBasedValidator::CheckRequired(UObject* Outer, UProperty* Property) const
+bool UMetadataBasedValidator::CheckRequired(UObject* Outer, FProperty* Property) const
 {
-	if(const auto SoftObjectProperty = Cast<USoftObjectProperty>(Property))
+	if(const auto SoftObjectProperty = CastFieldChecked<FSoftObjectProperty>(Property))
 	{
 		const auto Value = SoftObjectProperty->GetPropertyValue_InContainer(Outer);
 		if(Value.IsNull())

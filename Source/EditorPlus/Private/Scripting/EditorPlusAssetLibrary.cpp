@@ -346,6 +346,36 @@ TArray<FString> UEditorPlusAssetLibrary::GetAllMapFiles()
 	return Result;
 }
 
+// adapted from FPathContextMenu::ExecuteExplore
+TArray<FString> UEditorPlusAssetLibrary::GetFilePaths(const TArray<FAssetData>& AssetData, bool bRelativeToProject)
+{
+	TArray<FString> Result;
+
+	auto ProjectPath = FPaths::ProjectDir();
+    for (auto& Asset : AssetData)
+    {
+		const FString& Path = *Asset.ObjectPath.ToString();
+		FString FilePath;
+		static const FString ClassesRootPrefix = TEXT("/Classes_");
+		if(Path.StartsWith(ClassesRootPrefix))
+		{
+			FilePath.Empty(); // unhandled for now
+		}
+		else
+		{
+			FilePath = FPaths::ConvertRelativePathToFull(FPackageName::LongPackageNameToFilename(Asset.ObjectPath.ToString() + TEXT("/")));
+			if(bRelativeToProject)
+			{
+				FPaths::MakePathRelativeTo(FilePath, *ProjectPath);
+			}
+		}
+
+		Result.Add(FilePath);        
+    }
+
+	return Result;
+}
+
 #pragma region Not Working
 
 // NOTE: This doesn't seem to work

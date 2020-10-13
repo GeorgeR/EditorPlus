@@ -17,5 +17,5 @@ public:
 	EDataValidationResult ValidateLoadedAsset_Implementation(UObject* InAsset, TArray<FText>& ValidationErrors) override;
 
 protected:
-	bool CheckRequired(UObject* Outer, UProperty* Property) const;
+	bool CheckRequired(UObject* Outer, FProperty* Property) const;
 };

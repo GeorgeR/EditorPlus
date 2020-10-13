@@ -52,9 +52,8 @@ UMaterialInterface* UEditorPlusMaterialLibrary::CreateMaterialInstance(UMaterial
 
 bool UEditorPlusMaterialLibrary::SetVectorParameter(UMaterialInterface* Material, const FName Name, FLinearColor Value)
 {
-        {
-			return SetMaterialInstanceParameter<FLinearColor>(Material, Name, Value, UMaterialEditingLibrary::SetMaterialInstanceVectorParameterValue);
-		}
+	return SetMaterialInstanceParameter<FLinearColor>(Material, Name, Value, UMaterialEditingLibrary::SetMaterialInstanceVectorParameterValue);
+}
 
 bool UEditorPlusMaterialLibrary::SetVectorParameter_FromVector(UMaterialInterface* Material, const FName Name, FVector Value)
 {
@@ -68,7 +67,6 @@ bool UEditorPlusMaterialLibrary::SetScalarParameter(UMaterialInterface* Material
 
 bool UEditorPlusMaterialLibrary::SetTextureParameter(UMaterialInterface* Material, const FName Name, UTexture* Value)
 {
-
 	check(Material);    check(Value);
 
     return SetMaterialInstanceParameter<UTexture*>(Material, Name, Value, UMaterialEditingLibrary::SetMaterialInstanceTextureParameterValue);
@@ -102,5 +100,4 @@ bool UEditorPlusMaterialLibrary::SetMaterialInstanceParameter(
     }
 
     return false;
-}
 }
